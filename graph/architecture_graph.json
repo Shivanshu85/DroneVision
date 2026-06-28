@@ -1,0 +1,71 @@
+{
+  "nodes": [
+    {
+      "id": "arch:input",
+      "name": "Image / Video Input",
+      "category": "Input"
+    },
+    {
+      "id": "arch:backbone",
+      "name": "DroneBackbone (Feature Extractor)",
+      "category": "Model"
+    },
+    {
+      "id": "arch:neck",
+      "name": "DroneNeck (FPN Fusion)",
+      "category": "Model"
+    },
+    {
+      "id": "arch:head",
+      "name": "DroneHead (Multi-scale Predictor)",
+      "category": "Model"
+    },
+    {
+      "id": "arch:loss",
+      "name": "DetectionLoss (Target Assignment + CIoU)",
+      "category": "Loss"
+    },
+    {
+      "id": "arch:nms",
+      "name": "NMS (Post-processing)",
+      "category": "Post-processing"
+    },
+    {
+      "id": "arch:output",
+      "name": "Count & Bounding Boxes",
+      "category": "Output"
+    }
+  ],
+  "edges": [
+    {
+      "source": "arch:input",
+      "target": "arch:backbone",
+      "label": "Feed image"
+    },
+    {
+      "source": "arch:backbone",
+      "target": "arch:neck",
+      "label": "Pass P3, P4, P5 scales"
+    },
+    {
+      "source": "arch:neck",
+      "target": "arch:head",
+      "label": "Pass fused scales N3, N4, N5"
+    },
+    {
+      "source": "arch:head",
+      "target": "arch:loss",
+      "label": "Calculate box/obj/cls losses (Training)"
+    },
+    {
+      "source": "arch:head",
+      "target": "arch:nms",
+      "label": "Filter low-confidence predictions (Inference)"
+    },
+    {
+      "source": "arch:nms",
+      "target": "arch:output",
+      "label": "Count valid boxes"
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+# Set default behavior to automatically normalize line endings
+* text=auto eol=lf
+
+# Explicitly declare files that should always have LF line endings
+*.py text eol=lf
+*.sh text eol=lf
+*.yaml text eol=lf
+*.yml text eol=lf
+*.json text eol=lf
+*.md text eol=lf
+
+# Git LFS tracking for model checkpoints
+*.pth filter=lfs diff=lfs merge=lfs -text
+*.pt filter=lfs diff=lfs merge=lfs -text
+*.onnx filter=lfs diff=lfs merge=lfs -text
+*.pth.tar filter=lfs diff=lfs merge=lfs -text
+
+# Binary assets
+*.jpg binary
+*.png binary
+*.webp binary
+*.gif binary
+*.ico binary
+*.zip binary
+*.tar.gz binary

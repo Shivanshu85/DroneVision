@@ -1,0 +1,87 @@
+# =============================================================================
+# DroneVision — Phase 2 Training Configuration  (EXP-002)
+# Purpose : Custom Mosaic Integration experiment.
+#           Increases mosaic probability to 0.8 and extends training to
+#           100 epochs to improve small drone recall and generalization
+#           over the Phase 1 baseline (mAP50 = 0.82 @ 50 epochs).
+# Image   : 640x640
+# Batch   : 4  (6 GB VRAM — same VRAM budget as Phase 1)
+# Epochs  : 100
+# Target  : mAP50 >= 0.85  |  mAP50-95 >= 0.60  |  Recall >= 0.82
+# =============================================================================
+
+model:
+  image_size: 640
+  num_classes: 1                  # 0 = Drone (UAV)
+  num_anchors: 3                  # anchors per scale
+  strides: [8, 16, 32]           # detection scale strides
+
+  # Same anchors as Phase 1 — validated via K-Means on DUT Anti-UAV.
+  # Retain for direct comparison; re-tune in Phase 3 if mAP stagnates.
+  anchors:
+    - [[6, 6],    [10, 10],  [16, 16]]   # P3 stride-8  — very small drones
+    - [[24, 24],  [38, 38],  [56, 56]]   # P4 stride-16 — medium drones
+    - [[80, 80],  [110, 110], [160, 160]] # P5 stride-32 — large/close drones
+
+  # Same backbone/neck dimensions as Phase 1 for fair comparison
+  backbone_channels: [32, 64, 128, 256]
+  neck_channels: [64, 128, 128]
+
+data:
+  train: datasets/images/train
+  val:   datasets/images/val
+  test:  datasets/images/test
+  label_dir: datasets/labels
+  num_workers: 0          # 0 = main process only (required on Windows)
+  pin_memory: false       # pin_memory requires CUDA; disabled for CPU
+
+  class_names:
+    0: "drone"
+
+# -----------------------------------------------------------------------------
+# Key change vs Phase 1:
+#   mosaic   0.5  →  0.8   (primary lever for small-drone recall)
+#   mixup    0.15 →  0.25  (stronger regularisation over 100 epochs)
+# All other augmentations kept identical to Phase 1 for ablation clarity.
+# -----------------------------------------------------------------------------
+augmentation:
+  enabled: true
+  horizontal_flip: 0.5
+  vertical_flip:   0.3
+  color_jitter:    0.8
+  mosaic:          0.8    # ↑ from 0.5 — forces detection in compressed quadrants
+  mixup:           0.25   # ↑ from 0.15 — stronger feature regularisation
+  random_scale:    0.5
+  gaussian_blur:   0.2
+
+train:
+  epochs: 100             # ↑ from 50 — mosaic needs more epochs to converge
+  batch_size: 4           # unchanged — 6 GB VRAM constraint
+  optimizer: adamw
+  lr: 0.0005              # ↓ from 0.001 — lower initial LR for stable mosaic training
+  weight_decay: 0.0005
+  momentum: 0.937
+  warmup_epochs: 5        # ↑ from 3 — longer warmup given lower LR
+  scheduler: cosine
+  mixed_precision: false  # disabled: no CUDA GPU available (CPU-only)
+  gradient_clip: 10.0
+  seed: 42
+  checkpoint_dir: runs/phase2
+  save_period: 10         # save every 10 epochs (100 epoch run)
+
+loss:
+  lambda_box: 7.5
+  lambda_obj: 1.0
+  lambda_cls: 0.5
+  anchor_threshold: 4.0
+  obj_pos_weight: 1.0
+  cls_pos_weight: 1.0
+
+inference:
+  conf_threshold: 0.25
+  iou_threshold:  0.45
+
+logging:
+  mlflow_tracking_uri: mlruns/
+  experiment_name: dronevision_phase2
+  log_interval: 10

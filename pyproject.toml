@@ -1,0 +1,111 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "dronevision"
+version = "0.1.0"
+description = "Custom single-class drone detection and counting system"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+keywords = ["drone", "detection", "computer-vision", "pytorch"]
+
+dependencies = [
+    "torch>=2.2.0",
+    "torchvision>=0.17.0",
+    "opencv-python>=4.9.0",
+    "numpy>=1.26.0",
+    "pyyaml>=6.0.1",
+    "mlflow>=2.12.0",
+    "tqdm>=4.66.4",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.1.0",
+    "pytest-cov>=5.0.0",
+]
+api = [
+    "fastapi>=0.111.0",
+    "uvicorn>=0.29.0",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["dronevision*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "-v --tb=short"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+exclude = [
+    "dronevision",
+    "scripts",
+    "tests",
+    "demo",
+    "venv_cuda",
+]
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # Pyflakes
+    "I",   # isort
+    "B",   # flake8-bugbear
+    "UP",  # pyupgrade
+    "S",   # flake8-bandit
+]
+ignore = [
+    "S101",  # Allow assert statements in tests and code
+    "B008",  # Allow function call in default argument values (common in CLI/gradio)
+    "W293",  # Blank line contains whitespace
+    "W291",  # Trailing whitespace
+    "E501",  # Line too long
+    "F401",  # Unused import
+    "I001",  # Import block is unsorted
+    "E402",  # Module level import not at top of file
+    "S311",  # Standard pseudo-random generators
+    "F541",  # f-string missing placeholders
+    "B905",  # zip() without explicit strict=
+    "F841",  # Unused local variable
+    "UP037", # Quoted annotation
+    "E702",  # Multiple statements on one line
+    "B007",  # Loop control variable not used
+    "B023",  # Function definition uses loop variable
+    "S112",  # try-except-continue
+    "S314",  # Using xml.etree to parse untrusted XML
+    "E401",  # Multiple imports on one line
+    "E731",  # Do not assign a lambda expression
+    "S105",  # Possible hardcoded password
+    "S110",  # try-except-pass
+    "S324",  # Insecure hash function (MD5/SHA1)
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S101"]
+
+[tool.mypy]
+python_version = "3.11"
+ignore_missing_imports = true
+warn_unused_configs = true
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
+check_untyped_defs = true
+exclude = "dronevision|scripts|tests|demo"
+
+[[tool.mypy.overrides]]
+module = [
+    "dronevision.*",
+    "demo.*",
+    "scripts.*"
+]
+ignore_errors = true
+

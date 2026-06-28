@@ -1,0 +1,2469 @@
+{
+  "nodes": [
+    {
+      "id": "file:dronevision/__init__.py",
+      "type": "file",
+      "name": "__init__.py",
+      "path": "dronevision/__init__.py"
+    },
+    {
+      "id": "file:dronevision/data/augmentation.py",
+      "type": "file",
+      "name": "augmentation.py",
+      "path": "dronevision/data/augmentation.py"
+    },
+    {
+      "id": "func:dronevision/data/augmentation.py:_clip_and_filter_boxes",
+      "type": "function",
+      "name": "_clip_and_filter_boxes",
+      "file": "dronevision/data/augmentation.py",
+      "args": [
+        "boxes",
+        "img_h",
+        "img_w",
+        "min_size"
+      ],
+      "docstring": "Clip normalized cxcywh boxes to [0,1] and remove degenerate ones.\n\nArgs:\n    boxes:    (N, 5) [cls, cx, cy, w, h] normalized.\n    img_h, img_w: Current image dimensions (used for pixel size check).\n    min_size: Minimum width and height in pixels.\n\nReturns:\n    Filtered (M, 5) boxes where M <= N."
+    },
+    {
+      "id": "class:dronevision/data/augmentation.py:DroneAugmentation",
+      "type": "class",
+      "name": "DroneAugmentation",
+      "file": "dronevision/data/augmentation.py",
+      "bases": []
+    },
+    {
+      "id": "func:dronevision/data/augmentation.py:DroneAugmentation.__init__",
+      "type": "function",
+      "name": "DroneAugmentation.__init__",
+      "file": "dronevision/data/augmentation.py",
+      "args": [
+        "self",
+        "cfg",
+        "img_size"
+      ],
+      "docstring": ""
+    },
+    {
+      "id": "func:dronevision/data/augmentation.py:DroneAugmentation.apply",
+      "type": "function",
+      "name": "DroneAugmentation.apply",
+      "file": "dronevision/data/augmentation.py",
+      "args": [
+        "self",
+        "image",
+        "boxes",
+        "dataset"
+      ],
+      "docstring": "Apply the full augmentation pipeline to one (image, boxes) pair.\n\nArgs:\n    image:   (H, W, 3) uint8 BGR image (already letterboxed).\n    boxes:   (N, 5) [cls, cx, cy, w, h] normalized.\n    dataset: The DroneDataset instance (needed for Mosaic/MixUp\n             which require additional random samples).\n\nReturns:\n    (augmented_image, augmented_boxes)"
+    },
+    {
+      "id": "func:dronevision/data/augmentation.py:DroneAugmentation._hflip",
+      "type": "function",
+      "name": "DroneAugmentation._hflip",
+      "file": "dronevision/data/augmentation.py",
+      "args": [
+        "self",
+        "image",
+        "boxes"
+      ],
+      "docstring": "Horizontal flip \u2014 mirror cx coordinate."
+    },
+    {
+      "id": "func:dronevision/data/augmentation.py:DroneAugmentation._vflip",
+      "type": "function",
+      "name": "DroneAugmentation._vflip",
+      "file": "dronevision/data/augmentation.py",
+      "args": [
+        "self",
+        "image",
+        "boxes"
+      ],
+      "docstring": "Vertical flip \u2014 mirror cy coordinate."
+    },
+    {
+      "id": "func:dronevision/data/augmentation.py:DroneAugmentation._color_jitter",
+      "type": "function",
+      "name": "DroneAugmentation._color_jitter",
+      "file": "dronevision/data/augmentation.py",
+      "args": [
+        "self",
+        "image"
+      ],
+      "docstring": "Apply random HSV jitter for brightness, contrast, and saturation.\n\nUses HSV color space for perceptually uniform adjustment."
+    },
+    {
+      "id": "func:dronevision/data/augmentation.py:DroneAugmentation._gaussian_blur",
+      "type": "function",
+      "name": "DroneAugmentation._gaussian_blur",
+      "file": "dronevision/data/augmentation.py",
+      "args": [
+        "self",
+        "image"
+      ],
+      "docstring": "Apply mild Gaussian blur to simulate motion blur / long-range imaging."
+    },
+    {
+      "id": "func:dronevision/data/augmentation.py:DroneAugmentation._random_scale",
+      "type": "function",
+      "name": "DroneAugmentation._random_scale",
+      "file": "dronevision/data/augmentation.py",
+      "args": [
+        "self",
+        "image",
+        "boxes"
+      ],
+      "docstring": "Random scale augmentation \u2014 simulates altitude variation.\n\nThe image is scaled by a random factor in [0.5, 1.5] and then\nletterboxed back to img_size. This effectively simulates a drone\nappearing larger or smaller in the frame."
+    },
+    {
+      "id": "func:dronevision/data/augmentation.py:DroneAugmentation._mosaic",
+      "type": "function",
+      "name": "DroneAugmentation._mosaic",
+      "file": "dronevision/data/augmentation.py",
+      "args": [
+        "self",
+        "image",
+        "boxes",
+        "dataset"
+      ],
+      "docstring": "4-image mosaic augmentation.\n\nRandomly samples 3 additional images from the dataset and places\nall 4 images in the quadrants of a 2\u00d7img_size canvas, then crops\na random img_size\u00d7img_size region from the center.\n\nCritical for small drone detection: a drone that appears small in\none image will appear in a compressed quadrant, further testing\nthe model's ability to detect tiny targets."
+    },
+    {
+      "id": "func:dronevision/data/augmentation.py:DroneAugmentation._mixup",
+      "type": "function",
+      "name": "DroneAugmentation._mixup",
+      "file": "dronevision/data/augmentation.py",
+      "args": [
+        "self",
+        "image",
+        "boxes",
+        "dataset"
+      ],
+      "docstring": "MixUp augmentation \u2014 blend two images with a random Beta(8,8) ratio.\n\nUnlike image classification MixUp, for detection we use a hard label\ncombination: simply concatenate the two sets of boxes."
+    },
+    {
+      "id": "file:dronevision/data/collate.py",
+      "type": "file",
+      "name": "collate.py",
+      "path": "dronevision/data/collate.py"
+    },
+    {
+      "id": "func:dronevision/data/collate.py:drone_collate_fn",
+      "type": "function",
+      "name": "drone_collate_fn",
+      "file": "dronevision/data/collate.py",
+      "args": [
+        "batch"
+      ],
+      "docstring": "Collate a batch of (image, labels, path) samples.\n\nArgs:\n    batch: List of tuples returned by DroneDataset.__getitem__:\n           - image:   (3, H, W) float32 tensor\n           - labels:  (N_i, 5) float32 tensor [cls, cx, cy, w, h] or (0, 5)\n           - path:    str\n\nReturns:\n    images:  (B, 3, H, W) stacked tensor.\n    targets: (N_total, 6) tensor where each row is\n             [batch_idx, cls, cx, cy, w, h].\n             Empty tensor (0, 6) if no GT boxes exist in the batch.\n    paths:   list of B path strings."
+    },
+    {
+      "id": "file:dronevision/data/converter.py",
+      "type": "file",
+      "name": "converter.py",
+      "path": "dronevision/data/converter.py"
+    },
+    {
+      "id": "class:dronevision/data/converter.py:ConversionReport",
+      "type": "class",
+      "name": "ConversionReport",
+      "file": "dronevision/data/converter.py",
+      "bases": []
+    },
+    {
+      "id": "class:dronevision/data/converter.py:VocToYoloConverter",
+      "type": "class",
+      "name": "VocToYoloConverter",
+      "file": "dronevision/data/converter.py",
+      "bases": []
+    },
+    {
+      "id": "func:dronevision/data/converter.py:VocToYoloConverter.to_dict",
+      "type": "function",
+      "name": "VocToYoloConverter.to_dict",
+      "file": "dronevision/data/converter.py",
+      "args": [
+        "self"
+      ],
+      "docstring": ""
+    },
+    {
+      "id": "func:dronevision/data/converter.py:VocToYoloConverter.__init__",
+      "type": "function",
+      "name": "VocToYoloConverter.__init__",
+      "file": "dronevision/data/converter.py",
+      "args": [
+        "self",
+        "class_map"
+      ],
+      "docstring": ""
+    },
+    {
+      "id": "func:dronevision/data/converter.py:VocToYoloConverter.convert",
+      "type": "function",
+      "name": "VocToYoloConverter.convert",
+      "file": "dronevision/data/converter.py",
+      "args": [
+        "self",
+        "source_dir",
+        "dest_dir",
+        "split",
+        "annotation_subdir",
+        "image_subdir",
+        "copy_images"
+      ],
+      "docstring": "Convert all annotations in source_dir to YOLO format in dest_dir.\n\nHandles two common DUT Anti-UAV directory layouts:\n\nLayout A (flat):\n    source_dir/\n        JPEGImages/  (or images/)\n        Annotations/ (or annotations/)\n\nLayout B (split-based):\n    source_dir/\n        train/\n            JPEGImages/\n            Annotations/\n        val/\n            ...\n\nArgs:\n    source_dir:        Root of the VOC dataset.\n    dest_dir:          Root of the output YOLO dataset.\n    split:             \"train\", \"val\", or \"test\".\n    annotation_subdir: Subdirectory name containing XML files.\n    image_subdir:      Subdirectory name containing image files.\n    copy_images:       Copy images to dest_dir if True.\n\nReturns:\n    ConversionReport with conversion statistics."
+    },
+    {
+      "id": "func:dronevision/data/converter.py:VocToYoloConverter._convert_single",
+      "type": "function",
+      "name": "VocToYoloConverter._convert_single",
+      "file": "dronevision/data/converter.py",
+      "args": [
+        "self",
+        "xml_path",
+        "img_dir",
+        "out_label_dir",
+        "out_image_dir",
+        "copy_images",
+        "report"
+      ],
+      "docstring": "Parse one XML file and write the corresponding YOLO .txt label."
+    },
+    {
+      "id": "func:dronevision/data/converter.py:VocToYoloConverter._resolve_dirs",
+      "type": "function",
+      "name": "VocToYoloConverter._resolve_dirs",
+      "file": "dronevision/data/converter.py",
+      "args": [
+        "source_dir",
+        "split",
+        "annotation_subdir",
+        "image_subdir"
+      ],
+      "docstring": "Try to locate annotation and image directories under various layouts.\n\nReturns:\n    (annotation_dir, image_dir) \u2014 either can be None if not found."
+    },
+    {
+      "id": "file:dronevision/data/dataset.py",
+      "type": "file",
+      "name": "dataset.py",
+      "path": "dronevision/data/dataset.py"
+    },
+    {
+      "id": "class:dronevision/data/dataset.py:DroneDataset",
+      "type": "class",
+      "name": "DroneDataset",
+      "file": "dronevision/data/dataset.py",
+      "bases": [
+        "Dataset"
+      ]
+    },
+    {
+      "id": "func:dronevision/data/dataset.py:DroneDataset.__init__",
+      "type": "function",
+      "name": "DroneDataset.__init__",
+      "file": "dronevision/data/dataset.py",
+      "args": [
+        "self",
+        "image_dir",
+        "label_dir",
+        "img_size",
+        "augment",
+        "aug_cfg",
+        "is_training"
+      ],
+      "docstring": ""
+    },
+    {
+      "id": "func:dronevision/data/dataset.py:DroneDataset.__len__",
+      "type": "function",
+      "name": "DroneDataset.__len__",
+      "file": "dronevision/data/dataset.py",
+      "args": [
+        "self"
+      ],
+      "docstring": ""
+    },
+    {
+      "id": "func:dronevision/data/dataset.py:DroneDataset.__getitem__",
+      "type": "function",
+      "name": "DroneDataset.__getitem__",
+      "file": "dronevision/data/dataset.py",
+      "args": [
+        "self",
+        "idx"
+      ],
+      "docstring": "Load, preprocess, and optionally augment one sample.\n\nArgs:\n    idx: Sample index.\n\nReturns:\n    image:   (3, H, W) float32 tensor, normalized to [0, 1].\n    targets: (N, 5) float32 tensor [cls, cx, cy, w, h] normalized,\n             or empty tensor (0, 5) for background images.\n    path:    Absolute path string of the source image."
+    },
+    {
+      "id": "func:dronevision/data/dataset.py:DroneDataset.load_raw",
+      "type": "function",
+      "name": "DroneDataset.load_raw",
+      "file": "dronevision/data/dataset.py",
+      "args": [
+        "self",
+        "idx"
+      ],
+      "docstring": "Load the raw (un-preprocessed) image and label for sample idx.\n\nUsed internally by augmentation functions (Mosaic, MixUp) to fetch\nadditional random samples without going through the full pipeline.\n\nArgs:\n    idx: Sample index.\n\nReturns:\n    (image_bgr, boxes, image_path)\n    boxes: (N, 5) [cls, cx, cy, w, h] normalized or None."
+    },
+    {
+      "id": "func:dronevision/data/dataset.py:DroneDataset._load_label",
+      "type": "function",
+      "name": "DroneDataset._load_label",
+      "file": "dronevision/data/dataset.py",
+      "args": [
+        "label_path"
+      ],
+      "docstring": "Parse a YOLO label file.\n\nArgs:\n    label_path: Path to the .txt label file.\n\nReturns:\n    (N, 5) float32 array [cls, cx, cy, w, h] or\n    (0, 5) empty array if the file is missing or empty."
+    },
+    {
+      "id": "func:dronevision/data/dataset.py:DroneDataset.get_label_stats",
+      "type": "function",
+      "name": "DroneDataset.get_label_stats",
+      "file": "dronevision/data/dataset.py",
+      "args": [
+        "self"
+      ],
+      "docstring": "Compute summary statistics over the full dataset labels.\n\nReturns:\n    Dict with keys: total_images, total_boxes, background_images,\n                    avg_boxes_per_image, box_wh_array."
+    },
+    {
+      "id": "file:dronevision/data/transforms.py",
+      "type": "file",
+      "name": "transforms.py",
+      "path": "dronevision/data/transforms.py"
+    },
+    {
+      "id": "class:dronevision/data/transforms.py:Letterbox",
+      "type": "class",
+      "name": "Letterbox",
+      "file": "dronevision/data/transforms.py",
+      "bases": []
+    },
+    {
+      "id": "class:dronevision/data/transforms.py:ToTensor",
+      "type": "class",
+      "name": "ToTensor",
+      "file": "dronevision/data/transforms.py",
+      "bases": []
+    },
+    {
+      "id": "func:dronevision/data/transforms.py:ToTensor.rescale_boxes",
+      "type": "function",
+      "name": "ToTensor.rescale_boxes",
+      "file": "dronevision/data/transforms.py",
+      "args": [
+        "boxes",
+        "meta"
+      ],
+      "docstring": "Reverse a letterbox transform \u2014 map predicted boxes back to original image space.\n\nArgs:\n    boxes:  (N, 4) normalized cxcywh boxes in letterboxed image space.\n    meta:   Meta dict returned by Letterbox.__call__.\n\nReturns:\n    (N, 4) normalized cxcywh boxes in original image space."
+    },
+    {
+      "id": "func:dronevision/data/transforms.py:ToTensor.__init__",
+      "type": "function",
+      "name": "ToTensor.__init__",
+      "file": "dronevision/data/transforms.py",
+      "args": [
+        "self",
+        "target_size",
+        "stride",
+        "pad_color"
+      ],
+      "docstring": ""
+    },
+    {
+      "id": "func:dronevision/data/transforms.py:ToTensor.__call__",
+      "type": "function",
+      "name": "ToTensor.__call__",
+      "file": "dronevision/data/transforms.py",
+      "args": [
+        "self",
+        "image",
+        "boxes"
+      ],
+      "docstring": "Apply letterbox resize to image and adjust box coordinates.\n\nArgs:\n    image:  HWC uint8 BGR image.\n    boxes:  (N, 5) [cls, cx, cy, w, h] normalized, or None.\n\nReturns:\n    (resized_image, adjusted_boxes, meta)\n    meta contains: {ratio, pad_left, pad_top, orig_h, orig_w}"
+    },
+    {
+      "id": "func:dronevision/data/transforms.py:ToTensor.__init__",
+      "type": "function",
+      "name": "ToTensor.__init__",
+      "file": "dronevision/data/transforms.py",
+      "args": [
+        "self",
+        "normalize"
+      ],
+      "docstring": ""
+    },
+    {
+      "id": "func:dronevision/data/transforms.py:ToTensor.__call__",
+      "type": "function",
+      "name": "ToTensor.__call__",
+      "file": "dronevision/data/transforms.py",
+      "args": [
+        "self",
+        "image"
+      ],
+      "docstring": "Args:\n    image: (H, W, 3) uint8 BGR image.\n\nReturns:\n    (3, H, W) float32 array in RGB order."
+    },
+    {
+      "id": "file:dronevision/data/__init__.py",
+      "type": "file",
+      "name": "__init__.py",
+      "path": "dronevision/data/__init__.py"
+    },
+    {
+      "id": "file:dronevision/engine/callbacks.py",
+      "type": "file",
+      "name": "callbacks.py",
+      "path": "dronevision/engine/callbacks.py"
+    },
+    {
+      "id": "class:dronevision/engine/callbacks.py:EarlyStopping",
+      "type": "class",
+      "name": "EarlyStopping",
+      "file": "dronevision/engine/callbacks.py",
+      "bases": []
+    },
+    {
+      "id": "class:dronevision/engine/callbacks.py:WarmupCosineScheduler",
+      "type": "class",
+      "name": "WarmupCosineScheduler",
+      "file": "dronevision/engine/callbacks.py",
+      "bases": [
+        "_LRScheduler"
+      ]
+    },
+    {
+      "id": "func:dronevision/engine/callbacks.py:WarmupCosineScheduler.__init__",
+      "type": "function",
+      "name": "WarmupCosineScheduler.__init__",
+      "file": "dronevision/engine/callbacks.py",
+      "args": [
+        "self",
+        "patience",
+        "min_delta",
+        "mode"
+      ],
+      "docstring": ""
+    },
+    {
+      "id": "func:dronevision/engine/callbacks.py:WarmupCosineScheduler.__call__",
+      "type": "function",
+      "name": "WarmupCosineScheduler.__call__",
+      "file": "dronevision/engine/callbacks.py",
+      "args": [
+        "self",
+        "metric"
+      ],
+      "docstring": "Update state and return True if training should stop.\n\nArgs:\n    metric: Current epoch metric value.\n\nReturns:\n    True if training should stop."
+    },
+    {
+      "id": "func:dronevision/engine/callbacks.py:WarmupCosineScheduler.__init__",
+      "type": "function",
+      "name": "WarmupCosineScheduler.__init__",
+      "file": "dronevision/engine/callbacks.py",
+      "args": [
+        "self",
+        "optimizer",
+        "warmup_epochs",
+        "total_epochs",
+        "min_lr_ratio",
+        "last_epoch"
+      ],
+      "docstring": ""
+    },
+    {
+      "id": "func:dronevision/engine/callbacks.py:WarmupCosineScheduler.get_lr",
+      "type": "function",
+      "name": "WarmupCosineScheduler.get_lr",
+      "file": "dronevision/engine/callbacks.py",
+      "args": [
+        "self"
+      ],
+      "docstring": ""
+    },
+    {
+      "id": "file:dronevision/engine/evaluator.py",
+      "type": "file",
+      "name": "evaluator.py",
+      "path": "dronevision/engine/evaluator.py"
+    },
+    {
+      "id": "class:dronevision/engine/evaluator.py:EvalMetrics",
+      "type": "class",
+      "name": "EvalMetrics",
+      "file": "dronevision/engine/evaluator.py",
+      "bases": []
+    },
+    {
+      "id": "class:dronevision/engine/evaluator.py:EvalResults",
+      "type": "class",
+      "name": "EvalResults",
+      "file": "dronevision/engine/evaluator.py",
+      "bases": []
+    },
+    {
+      "id": "class:dronevision/engine/evaluator.py:DroneEvaluator",
+      "type": "class",
+      "name": "DroneEvaluator",
+      "file": "dronevision/engine/evaluator.py",
+      "bases": []
+    },
+    {
+      "id": "func:dronevision/engine/evaluator.py:DroneEvaluator.to_dict",
+      "type": "function",
+      "name": "DroneEvaluator.to_dict",
+      "file": "dronevision/engine/evaluator.py",
+      "args": [
+        "self"
+      ],
+      "docstring": ""
+    },
+    {
+      "id": "func:dronevision/engine/evaluator.py:DroneEvaluator.__str__",
+      "type": "function",
+      "name": "DroneEvaluator.__str__",
+      "file": "dronevision/engine/evaluator.py",
+      "args": [
+        "self"
+      ],
+      "docstring": ""
+    },
+    {
+      "id": "func:dronevision/engine/evaluator.py:DroneEvaluator.__init__",
+      "type": "function",
+      "name": "DroneEvaluator.__init__",
+      "file": "dronevision/engine/evaluator.py",
+      "args": [
+        "self",
+        "num_classes"
+      ],
+      "docstring": ""
+    },
+    {
+      "id": "func:dronevision/engine/evaluator.py:DroneEvaluator.reset",
+      "type": "function",
+      "name": "DroneEvaluator.reset",
+      "file": "dronevision/engine/evaluator.py",
+      "args": [
+        "self"
+      ],
+      "docstring": "Clear accumulated predictions and targets."
+    },
+    {
+      "id": "func:dronevision/engine/evaluator.py:DroneEvaluator.update",
+      "type": "function",
+      "name": "DroneEvaluator.update",
+      "file": "dronevision/engine/evaluator.py",
+      "args": [
+        "self",
+        "preds",
+        "targets"
+      ],
+      "docstring": "Accumulate one batch of predictions and ground truths.\n\nArgs:\n    preds:   List of B arrays, each (N_i, 6) [x1,y1,x2,y2,conf,cls]\n             in normalized [0,1] coords, or None for images with no dets.\n    targets: (N_total, 6) [batch_idx, cls, cx, cy, w, h] normalized,\n             as returned by drone_collate_fn."
+    },
+    {
+      "id": "func:dronevision/engine/evaluator.py:DroneEvaluator.compute",
+      "type": "function",
+      "name": "DroneEvaluator.compute",
+      "file": "dronevision/engine/evaluator.py",
+      "args": [
+        "self",
+        "iou_thresholds"
+      ],
+      "docstring": "Compute mAP50, mAP50-95, Precision, Recall, F1.\n\nArgs:\n    iou_thresholds: IoU thresholds for mAP computation.\n                    Default: [0.50, 0.55, ..., 0.95] (COCO style).\n\nReturns:\n    EvalResults with all metrics."
+    },
+    {
+      "id": "func:dronevision/engine/evaluator.py:DroneEvaluator._compute_ap_at_threshold",
+      "type": "function",
+      "name": "DroneEvaluator._compute_ap_at_threshold",
+      "file": "dronevision/engine/evaluator.py",
+      "args": [
+        "self",
+        "iou_thresh"
+      ],
+      "docstring": "Compute AP, Precision, Recall at a single IoU threshold.\n\nUses the VOC 2010+ (continuous) interpolation for AP."
+    },
+    {
+      "id": "func:dronevision/engine/evaluator.py:DroneEvaluator._compute_ap_continuous",
+      "type": "function",
+      "name": "DroneEvaluator._compute_ap_continuous",
+      "file": "dronevision/engine/evaluator.py",
+      "args": [
+        "recalls",
+        "precisions"
+      ],
+      "docstring": "Compute AP using continuous area under the PR curve.\n\nPrepend (0, 1) and append (1, 0) to ensure a complete curve."
+    },
+    {
+      "id": "file:dronevision/engine/trainer.py",
+      "type": "file",
+      "name": "trainer.py",
+      "path": "dronevision/engine/trainer.py"
+    },
+    {
+      "id": "class:dronevision/engine/trainer.py:DroneTrainer",
+      "type": "class",
+      "name": "DroneTrainer",
+      "file": "dronevision/engine/trainer.py",
+      "bases": []
+    },
+    {
+      "id": "func:dronevision/engine/trainer.py:DroneTrainer.__init__",
+      "type": "function",
+      "name": "DroneTrainer.__init__",
+      "file": "dronevision/engine/trainer.py",
+      "args": [
+        "self",
+        "cfg",
+        "resume_path"
+      ],
+      "docstring": ""
+    },
+    {
+      "id": "func:dronevision/engine/trainer.py:DroneTrainer.train",
+      "type": "function",
+      "name": "DroneTrainer.train",
+      "file": "dronevision/engine/trainer.py",
+      "args": [
+        "self"
+      ],
+      "docstring": "Run the complete training loop.\n\nReturns:\n    Dict with final evaluation metrics."
+    },
+    {
+      "id": "func:dronevision/engine/trainer.py:DroneTrainer._train_epoch",
+      "type": "function",
+      "name": "DroneTrainer._train_epoch",
+      "file": "dronevision/engine/trainer.py",
+      "args": [
+        "self",
+        "epoch"
+      ],
+      "docstring": "Run one training epoch. Returns averaged loss metrics."
+    },
+    {
+      "id": "func:dronevision/engine/trainer.py:DroneTrainer._validate",
+      "type": "function",
+      "name": "DroneTrainer._validate",
+      "file": "dronevision/engine/trainer.py",
+      "args": [
+        "self"
+      ],
+      "docstring": "Run validation and return EvalResults."
+    },
+    {
+      "id": "func:dronevision/engine/trainer.py:DroneTrainer._build_dataloaders",
+      "type": "function",
+      "name": "DroneTrainer._build_dataloaders",
+      "file": "dronevision/engine/trainer.py",
+      "args": [
+        "self"
+      ],
+      "docstring": ""
+    },
+    {
+      "id": "func:dronevision/engine/trainer.py:DroneTrainer._build_model",
+      "type": "function",
+      "name": "DroneTrainer._build_model",
+      "file": "dronevision/engine/trainer.py",
+      "args": [
+        "self"
+      ],
+      "docstring": ""
+    },
+    {
+      "id": "func:dronevision/engine/trainer.py:DroneTrainer._build_optimizer",
+      "type": "function",
+      "name": "DroneTrainer._build_optimizer",
+      "file": "dronevision/engine/trainer.py",
+      "args": [
+        "self"
+      ],
+      "docstring": ""
+    },
+    {
+      "id": "func:dronevision/engine/trainer.py:DroneTrainer._resume_from_checkpoint",
+      "type": "function",
+      "name": "DroneTrainer._resume_from_checkpoint",
+      "file": "dronevision/engine/trainer.py",
+      "args": [
+        "self"
+      ],
+      "docstring": ""
+    },
+    {
+      "id": "func:dronevision/engine/trainer.py:DroneTrainer._save_checkpoint",
+      "type": "function",
+      "name": "DroneTrainer._save_checkpoint",
+      "file": "dronevision/engine/trainer.py",
+      "args": [
+        "self",
+        "epoch",
+        "metrics",
+        "name"
+      ],
+      "docstring": ""
+    },
+    {
+      "id": "func:dronevision/engine/trainer.py:DroneTrainer._log_hyperparams",
+      "type": "function",
+      "name": "DroneTrainer._log_hyperparams",
+      "file": "dronevision/engine/trainer.py",
+      "args": [
+        "self"
+      ],
+      "docstring": ""
+    },
+    {
+      "id": "func:dronevision/engine/trainer.py:DroneTrainer._log_metrics",
+      "type": "function",
+      "name": "DroneTrainer._log_metrics",
+      "file": "dronevision/engine/trainer.py",
+      "args": [
+        "self",
+        "epoch",
+        "train_metrics",
+        "val_results"
+      ],
+      "docstring": ""
+    },
+    {
+      "id": "class:dronevision/engine/trainer.py:_MlflowStub",
+      "type": "class",
+      "name": "_MlflowStub",
+      "file": "dronevision/engine/trainer.py",
+      "bases": []
+    },
+    {
+      "id": "func:dronevision/engine/trainer.py:_MlflowStub.set_tracking_uri",
+      "type": "function",
+      "name": "_MlflowStub.set_tracking_uri",
+      "file": "dronevision/engine/trainer.py",
+      "args": [
+        "self"
+      ],
+      "docstring": ""
+    },
+    {
+      "id": "func:dronevision/engine/trainer.py:_MlflowStub.set_experiment",
+      "type": "function",
+      "name": "_MlflowStub.set_experiment",
+      "file": "dronevision/engine/trainer.py",
+      "args": [
+        "self"
+      ],
+      "docstring": ""
+    },
+    {
+      "id": "func:dronevision/engine/trainer.py:_MlflowStub.start_run",
+      "type": "function",
+      "name": "_MlflowStub.start_run",
+      "file": "dronevision/engine/trainer.py",
+      "args": [
+        "self"
+      ],
+      "docstring": ""
+    },
+    {
+      "id": "func:dronevision/engine/trainer.py:_MlflowStub.__enter__",
+      "type": "function",
+      "name": "_MlflowStub.__enter__",
+      "file": "dronevision/engine/trainer.py",
+      "args": [
+        "self"
+      ],
+      "docstring": ""
+    },
+    {
+      "id": "func:dronevision/engine/trainer.py:_MlflowStub.__exit__",
+      "type": "function",
+      "name": "_MlflowStub.__exit__",
+      "file": "dronevision/engine/trainer.py",
+      "args": [
+        "self"
+      ],
+      "docstring": ""
+    },
+    {
+      "id": "func:dronevision/engine/trainer.py:_MlflowStub.log_params",
+      "type": "function",
+      "name": "_MlflowStub.log_params",
+      "file": "dronevision/engine/trainer.py",
+      "args": [
+        "self"
+      ],
+      "docstring": ""
+    },
+    {
+      "id": "func:dronevision/engine/trainer.py:_MlflowStub.log_metric",
+      "type": "function",
+      "name": "_MlflowStub.log_metric",
+      "file": "dronevision/engine/trainer.py",
+      "args": [
+        "self"
+      ],
+      "docstring": ""
+    },
+    {
+      "id": "file:dronevision/engine/__init__.py",
+      "type": "file",
+      "name": "__init__.py",
+      "path": "dronevision/engine/__init__.py"
+    },
+    {
+      "id": "func:dronevision/engine/__init__.py:__getattr__",
+      "type": "function",
+      "name": "__getattr__",
+      "file": "dronevision/engine/__init__.py",
+      "args": [
+        "name"
+      ],
+      "docstring": ""
+    },
+    {
+      "id": "file:dronevision/inference/nms.py",
+      "type": "file",
+      "name": "nms.py",
+      "path": "dronevision/inference/nms.py"
+    },
+    {
+      "id": "func:dronevision/inference/nms.py:non_max_suppression",
+      "type": "function",
+      "name": "non_max_suppression",
+      "file": "dronevision/inference/nms.py",
+      "args": [
+        "predictions",
+        "conf_threshold",
+        "iou_threshold",
+        "max_detections"
+      ],
+      "docstring": "Apply confidence filtering and NMS to a batch of decoded predictions.\n\nArgs:\n    predictions:    (B, N, 5+nc) decoded predictions\n                    [cx, cy, w, h, obj_conf, cls_conf...].\n    conf_threshold: Minimum objectness \u00d7 class confidence to keep a detection.\n    iou_threshold:  IoU threshold for NMS suppression.\n    max_detections: Maximum number of detections to return per image.\n\nReturns:\n    List of B elements, each:\n      - np.ndarray of shape (M, 6) [x1, y1, x2, y2, conf, cls_id], or\n      - None if no detections survive filtering.\n    All coordinates are normalized to [0, 1]."
+    },
+    {
+      "id": "func:dronevision/inference/nms.py:_nms",
+      "type": "function",
+      "name": "_nms",
+      "file": "dronevision/inference/nms.py",
+      "args": [
+        "boxes",
+        "scores",
+        "iou_threshold"
+      ],
+      "docstring": "Greedy NMS on xyxy boxes sorted by score.\n\nArgs:\n    boxes:         (N, 4) xyxy tensor.\n    scores:        (N,) confidence scores.\n    iou_threshold: IoU threshold for suppression.\n\nReturns:\n    (K,) index tensor of kept detections."
+    },
+    {
+      "id": "func:dronevision/inference/nms.py:_box_iou",
+      "type": "function",
+      "name": "_box_iou",
+      "file": "dronevision/inference/nms.py",
+      "args": [
+        "box1",
+        "box2"
+      ],
+      "docstring": "Compute pairwise IoU between two sets of xyxy boxes.\n\nArgs:\n    box1: (M, 4) xyxy.\n    box2: (N, 4) xyxy.\n\nReturns:\n    (M, N) IoU matrix."
+    },
+    {
+      "id": "file:dronevision/inference/predictor.py",
+      "type": "file",
+      "name": "predictor.py",
+      "path": "dronevision/inference/predictor.py"
+    },
+    {
+      "id": "class:dronevision/inference/predictor.py:DronePredictor",
+      "type": "class",
+      "name": "DronePredictor",
+      "file": "dronevision/inference/predictor.py",
+      "bases": []
+    },
+    {
+      "id": "func:dronevision/inference/predictor.py:DronePredictor.__init__",
+      "type": "function",
+      "name": "DronePredictor.__init__",
+      "file": "dronevision/inference/predictor.py",
+      "args": [
+        "self",
+        "model",
+        "cfg",
+        "device"
+      ],
+      "docstring": ""
+    },
+    {
+      "id": "func:dronevision/inference/predictor.py:DronePredictor.from_checkpoint",
+      "type": "function",
+      "name": "DronePredictor.from_checkpoint",
+      "file": "dronevision/inference/predictor.py",
+      "args": [
+        "cls",
+        "checkpoint_path",
+        "cfg",
+        "device"
+      ],
+      "docstring": "Create a DronePredictor from a saved checkpoint.\n\nArgs:\n    checkpoint_path: Path to the .pth checkpoint file.\n    cfg:             Configuration dict matching the checkpoint.\n    device:          Target device.\n\nReturns:\n    DronePredictor instance ready for inference."
+    },
+    {
+      "id": "func:dronevision/inference/predictor.py:DronePredictor.predict_image",
+      "type": "function",
+      "name": "DronePredictor.predict_image",
+      "file": "dronevision/inference/predictor.py",
+      "args": [
+        "self",
+        "image"
+      ],
+      "docstring": "Run inference on a single image.\n\nArgs:\n    image: BGR numpy array (HWC uint8) or path to an image file.\n\nReturns:\n    Dict with keys:\n      - \"boxes\":       (M, 4) float32 array [x1,y1,x2,y2] normalized [0,1].\n      - \"confidences\": (M,) float32 confidence scores.\n      - \"drone_count\": int \u2014 number of detected drones.\n      - \"meta\":        Letterbox meta dict for coordinate rescaling."
+    },
+    {
+      "id": "func:dronevision/inference/predictor.py:DronePredictor.predict_batch",
+      "type": "function",
+      "name": "DronePredictor.predict_batch",
+      "file": "dronevision/inference/predictor.py",
+      "args": [
+        "self",
+        "image_paths"
+      ],
+      "docstring": "Run inference on multiple images.\n\nArgs:\n    image_paths: List of image file paths.\n\nReturns:\n    List of result dicts (same format as predict_image())."
+    },
+    {
+      "id": "file:dronevision/inference/visualizer.py",
+      "type": "file",
+      "name": "visualizer.py",
+      "path": "dronevision/inference/visualizer.py"
+    },
+    {
+      "id": "func:dronevision/inference/visualizer.py:draw_detections",
+      "type": "function",
+      "name": "draw_detections",
+      "file": "dronevision/inference/visualizer.py",
+      "args": [
+        "image",
+        "boxes",
+        "confidences",
+        "drone_count",
+        "color"
+      ],
+      "docstring": "Draw bounding boxes and optional drone count on an image.\n\nArgs:\n    image:        HWC uint8 BGR image (original resolution).\n    boxes:        (M, 4) float32 normalized [x1, y1, x2, y2] boxes.\n    confidences:  (M,) float32 confidence scores (optional).\n    drone_count:  Integer drone count to overlay (optional).\n                  If None, computed as len(boxes).\n    color:        BGR box color.\n\nReturns:\n    Annotated copy of the input image (HWC uint8 BGR)."
+    },
+    {
+      "id": "func:dronevision/inference/visualizer.py:save_annotated_image",
+      "type": "function",
+      "name": "save_annotated_image",
+      "file": "dronevision/inference/visualizer.py",
+      "args": [
+        "image",
+        "boxes",
+        "confidences",
+        "output_path",
+        "drone_count"
+      ],
+      "docstring": "Draw detections on an image and save to disk.\n\nArgs:\n    image:       HWC uint8 BGR image.\n    boxes:       (M, 4) normalized xyxy boxes.\n    confidences: (M,) confidence scores.\n    output_path: Destination file path.\n    drone_count: Override for count display."
+    },
+    {
+      "id": "file:dronevision/inference/__init__.py",
+      "type": "file",
+      "name": "__init__.py",
+      "path": "dronevision/inference/__init__.py"
+    },
+    {
+      "id": "file:dronevision/loss/detection_loss.py",
+      "type": "file",
+      "name": "detection_loss.py",
+      "path": "dronevision/loss/detection_loss.py"
+    },
+    {
+      "id": "class:dronevision/loss/detection_loss.py:DroneDetectionLoss",
+      "type": "class",
+      "name": "DroneDetectionLoss",
+      "file": "dronevision/loss/detection_loss.py",
+      "bases": [
+        "nn.Module"
+      ]
+    },
+    {
+      "id": "func:dronevision/loss/detection_loss.py:DroneDetectionLoss.__init__",
+      "type": "function",
+      "name": "DroneDetectionLoss.__init__",
+      "file": "dronevision/loss/detection_loss.py",
+      "args": [
+        "self",
+        "cfg"
+      ],
+      "docstring": ""
+    },
+    {
+      "id": "func:dronevision/loss/detection_loss.py:DroneDetectionLoss.forward",
+      "type": "function",
+      "name": "DroneDetectionLoss.forward",
+      "file": "dronevision/loss/detection_loss.py",
+      "args": [
+        "self",
+        "predictions",
+        "targets",
+        "anchors"
+      ],
+      "docstring": "Compute the combined detection loss.\n\nArgs:\n    predictions: List of 3 raw prediction tensors from DroneHead, each\n                 (B, num_anchors, H_i, W_i, 5+nc).\n    targets:     (N, 6) float tensor [batch_idx, cls, cx, cy, w, h]\n                 normalized to [0,1]. Empty (0,6) for all-background batches.\n    anchors:     (3, 3, 2) anchor [w, h] tensor in pixel space (from model buffer).\n\nReturns:\n    (total_loss, metrics_dict)\n    metrics_dict contains: box_loss, obj_loss, cls_loss, total_loss."
+    },
+    {
+      "id": "func:dronevision/loss/detection_loss.py:DroneDetectionLoss._decode_box",
+      "type": "function",
+      "name": "DroneDetectionLoss._decode_box",
+      "file": "dronevision/loss/detection_loss.py",
+      "args": [
+        "self",
+        "raw_box",
+        "a_idx",
+        "anchor_set",
+        "gi",
+        "gj",
+        "H",
+        "W",
+        "stride"
+      ],
+      "docstring": "Decode raw box predictions to normalized cxcywh.\n\nYOLOv5-style decoding:\n    bx = (sigmoid(tx)*2 - 0.5 + gi) / W\n    by = (sigmoid(ty)*2 - 0.5 + gj) / H\n    bw = (sigmoid(tw)*2)^2 * anchor_w / img_size\n    bh = (sigmoid(th)*2)^2 * anchor_h / img_size\n\nArgs:\n    raw_box:    (n_pos, 4) raw tx,ty,tw,th.\n    a_idx:      (n_pos,) anchor indices.\n    anchor_set: (3, 2) anchor [w,h] pixels for this scale.\n    gi:         (n_pos,) grid x indices.\n    gj:         (n_pos,) grid y indices.\n    H, W:       Grid height and width.\n    stride:     This scale's stride.\n\nReturns:\n    (n_pos, 4) normalized cxcywh in [0,1]."
+    },
+    {
+      "id": "func:dronevision/loss/detection_loss.py:DroneDetectionLoss._build_targets",
+      "type": "function",
+      "name": "DroneDetectionLoss._build_targets",
+      "file": "dronevision/loss/detection_loss.py",
+      "args": [
+        "self",
+        "predictions",
+        "targets",
+        "anchors"
+      ],
+      "docstring": "Assign ground-truth boxes to anchor slots across all 3 scales.\n\nArgs:\n    predictions: List of 3 raw prediction tensors.\n    targets:     (N, 6) [batch_idx, cls, cx, cy, w, h] normalized.\n    anchors:     (3, 3, 2) pixel-space anchor tensor.\n\nReturns:\n    4 lists (one entry per scale):\n      - indices:  (b_tensor, a_tensor, gj_tensor, gi_tensor)\n      - tboxes:   (n_pos, 4) normalized cxcywh target boxes\n      - anch_matched: not used (for future extension)\n      - tclasses: (n_pos,) int64 class indices"
+    },
+    {
+      "id": "file:dronevision/loss/iou_loss.py",
+      "type": "file",
+      "name": "iou_loss.py",
+      "path": "dronevision/loss/iou_loss.py"
+    },
+    {
+      "id": "func:dronevision/loss/iou_loss.py:_cxcywh_to_xyxy",
+      "type": "function",
+      "name": "_cxcywh_to_xyxy",
+      "file": "dronevision/loss/iou_loss.py",
+      "args": [
+        "boxes"
+      ],
+      "docstring": "Convert (cx, cy, w, h) \u2192 (x1, y1, x2, y2). Last dim must be 4."
+    },
+    {
+      "id": "func:dronevision/loss/iou_loss.py:compute_iou",
+      "type": "function",
+      "name": "compute_iou",
+      "file": "dronevision/loss/iou_loss.py",
+      "args": [
+        "pred",
+        "target",
+        "eps"
+      ],
+      "docstring": "Compute element-wise IoU between cxcywh boxes.\n\nArgs:\n    pred:   (..., 4) predicted boxes [cx, cy, w, h].\n    target: (..., 4) target boxes    [cx, cy, w, h].\n    eps:    Small constant for numerical stability.\n\nReturns:\n    (...,) IoU scores in [0, 1]."
+    },
+    {
+      "id": "func:dronevision/loss/iou_loss.py:compute_ciou",
+      "type": "function",
+      "name": "compute_ciou",
+      "file": "dronevision/loss/iou_loss.py",
+      "args": [
+        "pred",
+        "target",
+        "eps"
+      ],
+      "docstring": "Compute element-wise CIoU between cxcywh boxes.\n\nCIoU = IoU - (center_distance\u00b2 / enclosing_diag\u00b2) - \u03b1\u00b7v\nwhere:\n    v = (4/\u03c0\u00b2) \u00b7 (arctan(tw/th) - arctan(pw/ph))\u00b2\n    \u03b1 = v / (1 - IoU + v)    (gradient-stopping weight)\n\nArgs:\n    pred:   (..., 4) predicted boxes [cx, cy, w, h] normalized.\n    target: (..., 4) target boxes    [cx, cy, w, h] normalized.\n    eps:    Numerical stability constant.\n\nReturns:\n    (...,) CIoU scores.  CIoU loss = 1 - CIoU.\n    Higher CIoU \u2192 better prediction (max = 1)."
+    },
+    {
+      "id": "func:dronevision/loss/iou_loss.py:ciou_loss",
+      "type": "function",
+      "name": "ciou_loss",
+      "file": "dronevision/loss/iou_loss.py",
+      "args": [
+        "pred",
+        "target"
+      ],
+      "docstring": "CIoU loss = 1 - CIoU(pred, target).\n\nArgs:\n    pred:   (..., 4) [cx, cy, w, h] normalized predicted boxes.\n    target: (..., 4) [cx, cy, w, h] normalized target boxes.\n\nReturns:\n    (...,) loss values in [0, ~2] (typically [0, 1.5] in practice)."
+    },
+    {
+      "id": "file:dronevision/loss/__init__.py",
+      "type": "file",
+      "name": "__init__.py",
+      "path": "dronevision/loss/__init__.py"
+    },
+    {
+      "id": "file:dronevision/models/backbone.py",
+      "type": "file",
+      "name": "backbone.py",
+      "path": "dronevision/models/backbone.py"
+    },
+    {
+      "id": "class:dronevision/models/backbone.py:DroneBackbone",
+      "type": "class",
+      "name": "DroneBackbone",
+      "file": "dronevision/models/backbone.py",
+      "bases": [
+        "nn.Module"
+      ]
+    },
+    {
+      "id": "func:dronevision/models/backbone.py:DroneBackbone.__init__",
+      "type": "function",
+      "name": "DroneBackbone.__init__",
+      "file": "dronevision/models/backbone.py",
+      "args": [
+        "self",
+        "in_channels",
+        "channels"
+      ],
+      "docstring": ""
+    },
+    {
+      "id": "func:dronevision/models/backbone.py:DroneBackbone._log_info",
+      "type": "function",
+      "name": "DroneBackbone._log_info",
+      "file": "dronevision/models/backbone.py",
+      "args": [
+        "self",
+        "channels"
+      ],
+      "docstring": ""
+    },
+    {
+      "id": "func:dronevision/models/backbone.py:DroneBackbone.forward",
+      "type": "function",
+      "name": "DroneBackbone.forward",
+      "file": "dronevision/models/backbone.py",
+      "args": [
+        "self",
+        "x"
+      ],
+      "docstring": "Args:\n    x: (B, 3, H, W) input image tensor.\n\nReturns:\n    (P3, P4, P5) feature maps at strides 8, 16, 32."
+    },
+    {
+      "id": "file:dronevision/models/blocks.py",
+      "type": "file",
+      "name": "blocks.py",
+      "path": "dronevision/models/blocks.py"
+    },
+    {
+      "id": "class:dronevision/models/blocks.py:CBS",
+      "type": "class",
+      "name": "CBS",
+      "file": "dronevision/models/blocks.py",
+      "bases": [
+        "nn.Module"
+      ]
+    },
+    {
+      "id": "class:dronevision/models/blocks.py:Bottleneck",
+      "type": "class",
+      "name": "Bottleneck",
+      "file": "dronevision/models/blocks.py",
+      "bases": [
+        "nn.Module"
+      ]
+    },
+    {
+      "id": "class:dronevision/models/blocks.py:SPPF",
+      "type": "class",
+      "name": "SPPF",
+      "file": "dronevision/models/blocks.py",
+      "bases": [
+        "nn.Module"
+      ]
+    },
+    {
+      "id": "func:dronevision/models/blocks.py:SPPF.__init__",
+      "type": "function",
+      "name": "SPPF.__init__",
+      "file": "dronevision/models/blocks.py",
+      "args": [
+        "self",
+        "in_ch",
+        "out_ch",
+        "k",
+        "s",
+        "p",
+        "g",
+        "act"
+      ],
+      "docstring": ""
+    },
+    {
+      "id": "func:dronevision/models/blocks.py:SPPF.forward",
+      "type": "function",
+      "name": "SPPF.forward",
+      "file": "dronevision/models/blocks.py",
+      "args": [
+        "self",
+        "x"
+      ],
+      "docstring": ""
+    },
+    {
+      "id": "func:dronevision/models/blocks.py:SPPF.__init__",
+      "type": "function",
+      "name": "SPPF.__init__",
+      "file": "dronevision/models/blocks.py",
+      "args": [
+        "self",
+        "in_ch",
+        "out_ch",
+        "shortcut",
+        "e"
+      ],
+      "docstring": ""
+    },
+    {
+      "id": "func:dronevision/models/blocks.py:SPPF.forward",
+      "type": "function",
+      "name": "SPPF.forward",
+      "file": "dronevision/models/blocks.py",
+      "args": [
+        "self",
+        "x"
+      ],
+      "docstring": ""
+    },
+    {
+      "id": "func:dronevision/models/blocks.py:SPPF.__init__",
+      "type": "function",
+      "name": "SPPF.__init__",
+      "file": "dronevision/models/blocks.py",
+      "args": [
+        "self",
+        "in_ch",
+        "out_ch",
+        "k"
+      ],
+      "docstring": ""
+    },
+    {
+      "id": "func:dronevision/models/blocks.py:SPPF.forward",
+      "type": "function",
+      "name": "SPPF.forward",
+      "file": "dronevision/models/blocks.py",
+      "args": [
+        "self",
+        "x"
+      ],
+      "docstring": ""
+    },
+    {
+      "id": "file:dronevision/models/detector.py",
+      "type": "file",
+      "name": "detector.py",
+      "path": "dronevision/models/detector.py"
+    },
+    {
+      "id": "class:dronevision/models/detector.py:DroneDetector",
+      "type": "class",
+      "name": "DroneDetector",
+      "file": "dronevision/models/detector.py",
+      "bases": [
+        "nn.Module"
+      ]
+    },
+    {
+      "id": "func:dronevision/models/detector.py:DroneDetector.__init__",
+      "type": "function",
+      "name": "DroneDetector.__init__",
+      "file": "dronevision/models/detector.py",
+      "args": [
+        "self",
+        "cfg"
+      ],
+      "docstring": ""
+    },
+    {
+      "id": "func:dronevision/models/detector.py:DroneDetector._log_summary",
+      "type": "function",
+      "name": "DroneDetector._log_summary",
+      "file": "dronevision/models/detector.py",
+      "args": [
+        "self"
+      ],
+      "docstring": ""
+    },
+    {
+      "id": "func:dronevision/models/detector.py:DroneDetector.forward",
+      "type": "function",
+      "name": "DroneDetector.forward",
+      "file": "dronevision/models/detector.py",
+      "args": [
+        "self",
+        "x"
+      ],
+      "docstring": "Args:\n    x: (B, 3, H, W) input image tensor.\n\nReturns:\n    Training mode: list of 3 raw prediction tensors, each\n                   (B, num_anchors, H_i, W_i, 5+nc).\n    Eval mode:     (B, N_total, 5+nc) decoded predictions\n                   where N_total = sum(H_i \u00d7 W_i \u00d7 num_anchors)."
+    },
+    {
+      "id": "func:dronevision/models/detector.py:DroneDetector._decode",
+      "type": "function",
+      "name": "DroneDetector._decode",
+      "file": "dronevision/models/detector.py",
+      "args": [
+        "self",
+        "raw_preds"
+      ],
+      "docstring": "Decode raw head outputs to normalized [cx, cy, w, h, obj, cls] predictions.\n\nArgs:\n    raw_preds: List of 3 raw tensors from DroneHead.\n\nReturns:\n    (B, N_total, 5+nc) decoded predictions, values in [0,1]."
+    },
+    {
+      "id": "func:dronevision/models/detector.py:DroneDetector.count_parameters",
+      "type": "function",
+      "name": "DroneDetector.count_parameters",
+      "file": "dronevision/models/detector.py",
+      "args": [
+        "self"
+      ],
+      "docstring": "Return parameter counts broken down by sub-module."
+    },
+    {
+      "id": "func:dronevision/models/detector.py:DroneDetector.save_checkpoint",
+      "type": "function",
+      "name": "DroneDetector.save_checkpoint",
+      "file": "dronevision/models/detector.py",
+      "args": [
+        "self",
+        "path",
+        "epoch",
+        "metrics",
+        "optimizer_state",
+        "scaler_state"
+      ],
+      "docstring": "Save model checkpoint with full training state.\n\nArgs:\n    path:            Output file path (.pth).\n    epoch:           Current epoch number.\n    metrics:         Dict of evaluation metrics at this checkpoint.\n    optimizer_state: Optimizer state_dict for training resumption.\n    scaler_state:    AMP GradScaler state_dict."
+    },
+    {
+      "id": "func:dronevision/models/detector.py:DroneDetector.load_checkpoint",
+      "type": "function",
+      "name": "DroneDetector.load_checkpoint",
+      "file": "dronevision/models/detector.py",
+      "args": [
+        "cls",
+        "path",
+        "cfg",
+        "device"
+      ],
+      "docstring": "Load a model from a checkpoint file.\n\nArgs:\n    path:   Path to .pth checkpoint.\n    cfg:    Configuration dict matching the checkpoint's model config.\n    device: Target device.\n\nReturns:\n    (model, checkpoint_dict) tuple."
+    },
+    {
+      "id": "file:dronevision/models/head.py",
+      "type": "file",
+      "name": "head.py",
+      "path": "dronevision/models/head.py"
+    },
+    {
+      "id": "class:dronevision/models/head.py:DetectionScale",
+      "type": "class",
+      "name": "DetectionScale",
+      "file": "dronevision/models/head.py",
+      "bases": [
+        "nn.Module"
+      ]
+    },
+    {
+      "id": "class:dronevision/models/head.py:DroneHead",
+      "type": "class",
+      "name": "DroneHead",
+      "file": "dronevision/models/head.py",
+      "bases": [
+        "nn.Module"
+      ]
+    },
+    {
+      "id": "func:dronevision/models/head.py:DroneHead.__init__",
+      "type": "function",
+      "name": "DroneHead.__init__",
+      "file": "dronevision/models/head.py",
+      "args": [
+        "self",
+        "in_ch",
+        "num_anchors",
+        "num_classes"
+      ],
+      "docstring": ""
+    },
+    {
+      "id": "func:dronevision/models/head.py:DroneHead._init_biases",
+      "type": "function",
+      "name": "DroneHead._init_biases",
+      "file": "dronevision/models/head.py",
+      "args": [
+        "self"
+      ],
+      "docstring": "Initialize objectness bias to log(prior_prob / (1 - prior_prob)).\n\nA prior objectness probability of 0.01 ensures the model starts by\npredicting almost no objects, which is appropriate given the extreme\nclass imbalance (very few drones vs many background locations)."
+    },
+    {
+      "id": "func:dronevision/models/head.py:DroneHead.forward",
+      "type": "function",
+      "name": "DroneHead.forward",
+      "file": "dronevision/models/head.py",
+      "args": [
+        "self",
+        "x"
+      ],
+      "docstring": "Args:\n    x: (B, in_ch, H, W) feature map.\n\nReturns:\n    (B, num_anchors, H, W, 5+nc) raw prediction tensor."
+    },
+    {
+      "id": "func:dronevision/models/head.py:DroneHead.__init__",
+      "type": "function",
+      "name": "DroneHead.__init__",
+      "file": "dronevision/models/head.py",
+      "args": [
+        "self",
+        "in_channels",
+        "num_classes",
+        "num_anchors"
+      ],
+      "docstring": ""
+    },
+    {
+      "id": "func:dronevision/models/head.py:DroneHead.forward",
+      "type": "function",
+      "name": "DroneHead.forward",
+      "file": "dronevision/models/head.py",
+      "args": [
+        "self",
+        "features"
+      ],
+      "docstring": "Args:\n    features: (N3, N4, N5) from neck.\n\nReturns:\n    List of 3 prediction tensors, each (B, num_anchors, H_i, W_i, 5+nc).\n    [scale0_pred, scale1_pred, scale2_pred] where:\n      scale0 \u2192 80\u00d780 (small drones)\n      scale1 \u2192 40\u00d740 (medium drones)\n      scale2 \u2192 20\u00d720 (large drones)"
+    },
+    {
+      "id": "file:dronevision/models/neck.py",
+      "type": "file",
+      "name": "neck.py",
+      "path": "dronevision/models/neck.py"
+    },
+    {
+      "id": "class:dronevision/models/neck.py:DroneNeck",
+      "type": "class",
+      "name": "DroneNeck",
+      "file": "dronevision/models/neck.py",
+      "bases": [
+        "nn.Module"
+      ]
+    },
+    {
+      "id": "func:dronevision/models/neck.py:DroneNeck.__init__",
+      "type": "function",
+      "name": "DroneNeck.__init__",
+      "file": "dronevision/models/neck.py",
+      "args": [
+        "self",
+        "in_channels",
+        "out_channels"
+      ],
+      "docstring": ""
+    },
+    {
+      "id": "func:dronevision/models/neck.py:DroneNeck._log_info",
+      "type": "function",
+      "name": "DroneNeck._log_info",
+      "file": "dronevision/models/neck.py",
+      "args": [
+        "self",
+        "in_channels",
+        "out_channels"
+      ],
+      "docstring": ""
+    },
+    {
+      "id": "func:dronevision/models/neck.py:DroneNeck.forward",
+      "type": "function",
+      "name": "DroneNeck.forward",
+      "file": "dronevision/models/neck.py",
+      "args": [
+        "self",
+        "features"
+      ],
+      "docstring": "Args:\n    features: (P3, P4, P5) from backbone.\n        P3: (B, 128, H/8,  W/8)\n        P4: (B, 256, H/16, W/16)\n        P5: (B, 256, H/32, W/32)\n\nReturns:\n    (N3, N4, N5) detection-ready feature maps:\n        N3: (B, 64,  H/8,  W/8)\n        N4: (B, 128, H/16, W/16)\n        N5: (B, 128, H/32, W/32)"
+    },
+    {
+      "id": "file:dronevision/models/__init__.py",
+      "type": "file",
+      "name": "__init__.py",
+      "path": "dronevision/models/__init__.py"
+    },
+    {
+      "id": "file:dronevision/utils/anchors.py",
+      "type": "file",
+      "name": "anchors.py",
+      "path": "dronevision/utils/anchors.py"
+    },
+    {
+      "id": "func:dronevision/utils/anchors.py:build_anchor_tensor",
+      "type": "function",
+      "name": "build_anchor_tensor",
+      "file": "dronevision/utils/anchors.py",
+      "args": [
+        "anchor_cfg",
+        "device"
+      ],
+      "docstring": "Convert the config anchor list to a (num_scales, num_anchors, 2) tensor.\n\nArgs:\n    anchor_cfg: Config list, e.g.\n        [[[6,6],[10,10],[16,16]], [[24,24],[38,38],[56,56]], ...]\n    device: Target device.\n\nReturns:\n    (3, 3, 2) float32 tensor: anchors[scale][anchor] = [w, h] in pixels."
+    },
+    {
+      "id": "func:dronevision/utils/anchors.py:make_grid",
+      "type": "function",
+      "name": "make_grid",
+      "file": "dronevision/utils/anchors.py",
+      "args": [
+        "grid_h",
+        "grid_w",
+        "device"
+      ],
+      "docstring": "Create a 2D grid of (x, y) cell origin coordinates.\n\nArgs:\n    grid_h: Number of rows (height) in the feature map.\n    grid_w: Number of columns (width) in the feature map.\n    device: Target device.\n\nReturns:\n    (grid_h, grid_w, 2) float32 tensor: grid[j][i] = [i, j] (x=col, y=row)."
+    },
+    {
+      "id": "func:dronevision/utils/anchors.py:decode_predictions",
+      "type": "function",
+      "name": "decode_predictions",
+      "file": "dronevision/utils/anchors.py",
+      "args": [
+        "raw",
+        "anchors",
+        "stride",
+        "img_size"
+      ],
+      "docstring": "Decode raw head output to normalized [cx, cy, w, h, obj, cls...].\n\nArgs:\n    raw:      (B, num_anchors, H, W, 5+nc) raw predictions.\n    anchors:  (num_anchors, 2) anchor [w, h] in pixel space.\n    stride:   Detection scale stride (e.g. 8, 16, 32).\n    img_size: Square image size (e.g. 640).\n\nReturns:\n    (B, num_anchors, H, W, 5+nc) decoded predictions, all in [0,1] except\n    obj/cls which are sigmoid-activated probabilities."
+    },
+    {
+      "id": "func:dronevision/utils/anchors.py:suggest_anchors_kmeans",
+      "type": "function",
+      "name": "suggest_anchors_kmeans",
+      "file": "dronevision/utils/anchors.py",
+      "args": [
+        "box_wh",
+        "k",
+        "img_size",
+        "n_iter",
+        "seed"
+      ],
+      "docstring": "Suggest k anchor sizes using k-means clustering on GT box dimensions.\n\nArgs:\n    box_wh:   (N, 2) array of [w, h] values (pixel space, img_size scale).\n    k:        Number of clusters (typically 9 = 3 scales \u00d7 3 anchors).\n    img_size: Target image size for normalization display.\n    n_iter:   Maximum k-means iterations.\n    seed:     Random seed.\n\nReturns:\n    (k, 2) array of sorted anchor [w, h] pairs (sorted by area)."
+    },
+    {
+      "id": "func:dronevision/utils/anchors.py:_wh_iou_distance",
+      "type": "function",
+      "name": "_wh_iou_distance",
+      "file": "dronevision/utils/anchors.py",
+      "args": [
+        "wh1",
+        "wh2"
+      ],
+      "docstring": "Compute 1 - IoU between all pairs of (w,h) boxes anchored at origin.\n\nArgs:\n    wh1: (N, 2) normalized width-height pairs.\n    wh2: (K, 2) normalized width-height pairs (centroids).\n\nReturns:\n    (N, K) distance matrix (1 - IoU)."
+    },
+    {
+      "id": "file:dronevision/utils/bbox.py",
+      "type": "file",
+      "name": "bbox.py",
+      "path": "dronevision/utils/bbox.py"
+    },
+    {
+      "id": "func:dronevision/utils/bbox.py:cxcywh_to_xyxy",
+      "type": "function",
+      "name": "cxcywh_to_xyxy",
+      "file": "dronevision/utils/bbox.py",
+      "args": [
+        "boxes"
+      ],
+      "docstring": "Convert (cx, cy, w, h) \u2192 (x1, y1, x2, y2).\n\nArgs:\n    boxes: (..., 4) tensor in center-format.\n\nReturns:\n    (..., 4) tensor in corner-format."
+    },
+    {
+      "id": "func:dronevision/utils/bbox.py:xyxy_to_cxcywh",
+      "type": "function",
+      "name": "xyxy_to_cxcywh",
+      "file": "dronevision/utils/bbox.py",
+      "args": [
+        "boxes"
+      ],
+      "docstring": "Convert (x1, y1, x2, y2) \u2192 (cx, cy, w, h).\n\nArgs:\n    boxes: (..., 4) tensor in corner-format.\n\nReturns:\n    (..., 4) tensor in center-format."
+    },
+    {
+      "id": "func:dronevision/utils/bbox.py:yolo_to_xyxy",
+      "type": "function",
+      "name": "yolo_to_xyxy",
+      "file": "dronevision/utils/bbox.py",
+      "args": [
+        "boxes",
+        "img_w",
+        "img_h"
+      ],
+      "docstring": "Convert normalized YOLO (cx, cy, w, h) \u2192 pixel (x1, y1, x2, y2).\n\nArgs:\n    boxes:  (..., 4) normalized cxcywh tensor.\n    img_w:  Image width in pixels.\n    img_h:  Image height in pixels.\n\nReturns:\n    (..., 4) pixel xyxy tensor."
+    },
+    {
+      "id": "func:dronevision/utils/bbox.py:xyxy_to_yolo",
+      "type": "function",
+      "name": "xyxy_to_yolo",
+      "file": "dronevision/utils/bbox.py",
+      "args": [
+        "boxes",
+        "img_w",
+        "img_h"
+      ],
+      "docstring": "Convert pixel (x1, y1, x2, y2) \u2192 normalized YOLO (cx, cy, w, h).\n\nArgs:\n    boxes:  (..., 4) pixel xyxy tensor.\n    img_w:  Image width in pixels.\n    img_h:  Image height in pixels.\n\nReturns:\n    (..., 4) normalized cxcywh tensor."
+    },
+    {
+      "id": "func:dronevision/utils/bbox.py:compute_iou_xyxy",
+      "type": "function",
+      "name": "compute_iou_xyxy",
+      "file": "dronevision/utils/bbox.py",
+      "args": [
+        "box1",
+        "box2"
+      ],
+      "docstring": "Compute element-wise IoU between two sets of xyxy boxes.\n\nArgs:\n    box1: (N, 4) xyxy tensor.\n    box2: (N, 4) xyxy tensor.\n\nReturns:\n    (N,) IoU scores."
+    },
+    {
+      "id": "func:dronevision/utils/bbox.py:compute_iou_matrix",
+      "type": "function",
+      "name": "compute_iou_matrix",
+      "file": "dronevision/utils/bbox.py",
+      "args": [
+        "boxes1",
+        "boxes2"
+      ],
+      "docstring": "Compute pairwise IoU matrix between two sets of xyxy boxes.\n\nArgs:\n    boxes1: (M, 4) xyxy tensor.\n    boxes2: (N, 4) xyxy tensor.\n\nReturns:\n    (M, N) IoU matrix."
+    },
+    {
+      "id": "func:dronevision/utils/bbox.py:clip_boxes_to_image",
+      "type": "function",
+      "name": "clip_boxes_to_image",
+      "file": "dronevision/utils/bbox.py",
+      "args": [
+        "boxes",
+        "img_h",
+        "img_w"
+      ],
+      "docstring": "Clip xyxy boxes to image boundaries.\n\nArgs:\n    boxes:  (..., 4) xyxy tensor.\n    img_h:  Image height.\n    img_w:  Image width.\n\nReturns:\n    Clipped (..., 4) xyxy tensor."
+    },
+    {
+      "id": "func:dronevision/utils/bbox.py:filter_small_boxes",
+      "type": "function",
+      "name": "filter_small_boxes",
+      "file": "dronevision/utils/bbox.py",
+      "args": [
+        "boxes",
+        "min_size"
+      ],
+      "docstring": "Return a boolean mask for boxes whose width and height are >= min_size.\n\nArgs:\n    boxes:    (N, 4) xyxy tensor.\n    min_size: Minimum side length in pixels.\n\nReturns:\n    (N,) boolean tensor \u2014 True = keep."
+    },
+    {
+      "id": "file:dronevision/utils/config.py",
+      "type": "file",
+      "name": "config.py",
+      "path": "dronevision/utils/config.py"
+    },
+    {
+      "id": "class:dronevision/utils/config.py:ConfigError",
+      "type": "class",
+      "name": "ConfigError",
+      "file": "dronevision/utils/config.py",
+      "bases": [
+        "ValueError"
+      ]
+    },
+    {
+      "id": "func:dronevision/utils/config.py:ConfigError.load_config",
+      "type": "function",
+      "name": "ConfigError.load_config",
+      "file": "dronevision/utils/config.py",
+      "args": [
+        "path"
+      ],
+      "docstring": "Load and validate a DroneVision YAML configuration file.\n\nArgs:\n    path: Absolute or relative path to the YAML config file.\n\nReturns:\n    Validated configuration dictionary.\n\nRaises:\n    FileNotFoundError: If the config file does not exist.\n    ConfigError: If required keys are missing or values are invalid."
+    },
+    {
+      "id": "func:dronevision/utils/config.py:ConfigError._validate_config",
+      "type": "function",
+      "name": "ConfigError._validate_config",
+      "file": "dronevision/utils/config.py",
+      "args": [
+        "cfg"
+      ],
+      "docstring": "Validate presence of required keys."
+    },
+    {
+      "id": "func:dronevision/utils/config.py:ConfigError._apply_defaults",
+      "type": "function",
+      "name": "ConfigError._apply_defaults",
+      "file": "dronevision/utils/config.py",
+      "args": [
+        "cfg"
+      ],
+      "docstring": "Apply default values for optional config keys."
+    },
+    {
+      "id": "file:dronevision/utils/logger.py",
+      "type": "file",
+      "name": "logger.py",
+      "path": "dronevision/utils/logger.py"
+    },
+    {
+      "id": "func:dronevision/utils/logger.py:configure_logging",
+      "type": "function",
+      "name": "configure_logging",
+      "file": "dronevision/utils/logger.py",
+      "args": [
+        "level",
+        "log_file"
+      ],
+      "docstring": "Configure the root logger once for the entire process.\n\nArgs:\n    level:    Logging level (e.g. logging.DEBUG, logging.INFO).\n    log_file: Optional path to write logs to a file in addition to stdout."
+    },
+    {
+      "id": "func:dronevision/utils/logger.py:get_logger",
+      "type": "function",
+      "name": "get_logger",
+      "file": "dronevision/utils/logger.py",
+      "args": [
+        "name"
+      ],
+      "docstring": "Return a child logger under the 'dronevision' namespace.\n\nArgs:\n    name: Typically __name__ of the calling module.\n\nReturns:\n    A Logger instance. If configure_logging() has not been called,\n    a default INFO-level stdout handler is applied automatically."
+    },
+    {
+      "id": "file:dronevision/utils/reproducibility.py",
+      "type": "file",
+      "name": "reproducibility.py",
+      "path": "dronevision/utils/reproducibility.py"
+    },
+    {
+      "id": "func:dronevision/utils/reproducibility.py:set_seed",
+      "type": "function",
+      "name": "set_seed",
+      "file": "dronevision/utils/reproducibility.py",
+      "args": [
+        "seed"
+      ],
+      "docstring": "Seed all random number generators for reproducible training.\n\nAffects:\n    - Python's random module\n    - NumPy\n    - PyTorch CPU and CUDA RNGs\n    - CuDNN deterministic mode\n\nArgs:\n    seed: Integer seed value (default: 42).\n\nNote:\n    CuDNN deterministic mode may reduce performance slightly.\n    Set CUBLAS_WORKSPACE_CONFIG=:4096:8 in the environment if\n    torch.use_deterministic_algorithms(True) is desired."
+    },
+    {
+      "id": "func:dronevision/utils/reproducibility.py:get_device",
+      "type": "function",
+      "name": "get_device",
+      "file": "dronevision/utils/reproducibility.py",
+      "args": [
+        "prefer_cuda"
+      ],
+      "docstring": "Select the best available compute device.\n\nPriority order (as specified in TRD.md):\n    1. CUDA\n    2. MPS (Apple Silicon)\n    3. CPU\n\nArgs:\n    prefer_cuda: If True (default), check for CUDA first.\n\nReturns:\n    torch.device for the selected backend.\n\nRaises:\n    RuntimeError: If training is attempted on CPU when prefer_cuda=True\n                  and CUDA is unavailable (logs a warning instead of raising)."
+    },
+    {
+      "id": "file:dronevision/utils/__init__.py",
+      "type": "file",
+      "name": "__init__.py",
+      "path": "dronevision/utils/__init__.py"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:dronevision/data/augmentation.py",
+      "target": "func:dronevision/data/augmentation.py:_clip_and_filter_boxes",
+      "relation": "defines"
+    },
+    {
+      "source": "file:dronevision/data/augmentation.py",
+      "target": "class:dronevision/data/augmentation.py:DroneAugmentation",
+      "relation": "defines"
+    },
+    {
+      "source": "class:dronevision/data/augmentation.py:DroneAugmentation",
+      "target": "func:dronevision/data/augmentation.py:DroneAugmentation.__init__",
+      "relation": "defines"
+    },
+    {
+      "source": "class:dronevision/data/augmentation.py:DroneAugmentation",
+      "target": "func:dronevision/data/augmentation.py:DroneAugmentation.apply",
+      "relation": "defines"
+    },
+    {
+      "source": "class:dronevision/data/augmentation.py:DroneAugmentation",
+      "target": "func:dronevision/data/augmentation.py:DroneAugmentation._hflip",
+      "relation": "defines"
+    },
+    {
+      "source": "class:dronevision/data/augmentation.py:DroneAugmentation",
+      "target": "func:dronevision/data/augmentation.py:DroneAugmentation._vflip",
+      "relation": "defines"
+    },
+    {
+      "source": "class:dronevision/data/augmentation.py:DroneAugmentation",
+      "target": "func:dronevision/data/augmentation.py:DroneAugmentation._color_jitter",
+      "relation": "defines"
+    },
+    {
+      "source": "class:dronevision/data/augmentation.py:DroneAugmentation",
+      "target": "func:dronevision/data/augmentation.py:DroneAugmentation._gaussian_blur",
+      "relation": "defines"
+    },
+    {
+      "source": "class:dronevision/data/augmentation.py:DroneAugmentation",
+      "target": "func:dronevision/data/augmentation.py:DroneAugmentation._random_scale",
+      "relation": "defines"
+    },
+    {
+      "source": "class:dronevision/data/augmentation.py:DroneAugmentation",
+      "target": "func:dronevision/data/augmentation.py:DroneAugmentation._mosaic",
+      "relation": "defines"
+    },
+    {
+      "source": "class:dronevision/data/augmentation.py:DroneAugmentation",
+      "target": "func:dronevision/data/augmentation.py:DroneAugmentation._mixup",
+      "relation": "defines"
+    },
+    {
+      "source": "file:dronevision/data/collate.py",
+      "target": "func:dronevision/data/collate.py:drone_collate_fn",
+      "relation": "defines"
+    },
+    {
+      "source": "file:dronevision/data/converter.py",
+      "target": "class:dronevision/data/converter.py:ConversionReport",
+      "relation": "defines"
+    },
+    {
+      "source": "file:dronevision/data/converter.py",
+      "target": "class:dronevision/data/converter.py:VocToYoloConverter",
+      "relation": "defines"
+    },
+    {
+      "source": "class:dronevision/data/converter.py:VocToYoloConverter",
+      "target": "func:dronevision/data/converter.py:VocToYoloConverter.to_dict",
+      "relation": "defines"
+    },
+    {
+      "source": "class:dronevision/data/converter.py:VocToYoloConverter",
+      "target": "func:dronevision/data/converter.py:VocToYoloConverter.__init__",
+      "relation": "defines"
+    },
+    {
+      "source": "class:dronevision/data/converter.py:VocToYoloConverter",
+      "target": "func:dronevision/data/converter.py:VocToYoloConverter.convert",
+      "relation": "defines"
+    },
+    {
+      "source": "class:dronevision/data/converter.py:VocToYoloConverter",
+      "target": "func:dronevision/data/converter.py:VocToYoloConverter._convert_single",
+      "relation": "defines"
+    },
+    {
+      "source": "class:dronevision/data/converter.py:VocToYoloConverter",
+      "target": "func:dronevision/data/converter.py:VocToYoloConverter._resolve_dirs",
+      "relation": "defines"
+    },
+    {
+      "source": "file:dronevision/data/dataset.py",
+      "target": "class:dronevision/data/dataset.py:DroneDataset",
+      "relation": "defines"
+    },
+    {
+      "source": "class:dronevision/data/dataset.py:DroneDataset",
+      "target": "func:dronevision/data/dataset.py:DroneDataset.__init__",
+      "relation": "defines"
+    },
+    {
+      "source": "class:dronevision/data/dataset.py:DroneDataset",
+      "target": "func:dronevision/data/dataset.py:DroneDataset.__len__",
+      "relation": "defines"
+    },
+    {
+      "source": "class:dronevision/data/dataset.py:DroneDataset",
+      "target": "func:dronevision/data/dataset.py:DroneDataset.__getitem__",
+      "relation": "defines"
+    },
+    {
+      "source": "class:dronevision/data/dataset.py:DroneDataset",
+      "target": "func:dronevision/data/dataset.py:DroneDataset.load_raw",
+      "relation": "defines"
+    },
+    {
+      "source": "class:dronevision/data/dataset.py:DroneDataset",
+      "target": "func:dronevision/data/dataset.py:DroneDataset._load_label",
+      "relation": "defines"
+    },
+    {
+      "source": "class:dronevision/data/dataset.py:DroneDataset",
+      "target": "func:dronevision/data/dataset.py:DroneDataset.get_label_stats",
+      "relation": "defines"
+    },
+    {
+      "source": "file:dronevision/data/transforms.py",
+      "target": "class:dronevision/data/transforms.py:Letterbox",
+      "relation": "defines"
+    },
+    {
+      "source": "file:dronevision/data/transforms.py",
+      "target": "class:dronevision/data/transforms.py:ToTensor",
+      "relation": "defines"
+    },
+    {
+      "source": "class:dronevision/data/transforms.py:ToTensor",
+      "target": "func:dronevision/data/transforms.py:ToTensor.rescale_boxes",
+      "relation": "defines"
+    },
+    {
+      "source": "class:dronevision/data/transforms.py:ToTensor",
+      "target": "func:dronevision/data/transforms.py:ToTensor.__init__",
+      "relation": "defines"
+    },
+    {
+      "source": "class:dronevision/data/transforms.py:ToTensor",
+      "target": "func:dronevision/data/transforms.py:ToTensor.__call__",
+      "relation": "defines"
+    },
+    {
+      "source": "class:dronevision/data/transforms.py:ToTensor",
+      "target": "func:dronevision/data/transforms.py:ToTensor.__init__",
+      "relation": "defines"
+    },
+    {
+      "source": "class:dronevision/data/transforms.py:ToTensor",
+      "target": "func:dronevision/data/transforms.py:ToTensor.__call__",
+      "relation": "defines"
+    },
+    {
+      "source": "file:dronevision/engine/callbacks.py",
+      "target": "class:dronevision/engine/callbacks.py:EarlyStopping",
+      "relation": "defines"
+    },
+    {
+      "source": "file:dronevision/engine/callbacks.py",
+      "target": "class:dronevision/engine/callbacks.py:WarmupCosineScheduler",
+      "relation": "defines"
+    },
+    {
+      "source": "class:dronevision/engine/callbacks.py:WarmupCosineScheduler",
+      "target": "func:dronevision/engine/callbacks.py:WarmupCosineScheduler.__init__",
+      "relation": "defines"
+    },
+    {
+      "source": "class:dronevision/engine/callbacks.py:WarmupCosineScheduler",
+      "target": "func:dronevision/engine/callbacks.py:WarmupCosineScheduler.__call__",
+      "relation": "defines"
+    },
+    {
+      "source": "class:dronevision/engine/callbacks.py:WarmupCosineScheduler",
+      "target": "func:dronevision/engine/callbacks.py:WarmupCosineScheduler.__init__",
+      "relation": "defines"
+    },
+    {
+      "source": "class:dronevision/engine/callbacks.py:WarmupCosineScheduler",
+      "target": "func:dronevision/engine/callbacks.py:WarmupCosineScheduler.get_lr",
+      "relation": "defines"
+    },
+    {
+      "source": "file:dronevision/engine/evaluator.py",
+      "target": "class:dronevision/engine/evaluator.py:EvalMetrics",
+      "relation": "defines"
+    },
+    {
+      "source": "file:dronevision/engine/evaluator.py",
+      "target": "class:dronevision/engine/evaluator.py:EvalResults",
+      "relation": "defines"
+    },
+    {
+      "source": "file:dronevision/engine/evaluator.py",
+      "target": "class:dronevision/engine/evaluator.py:DroneEvaluator",
+      "relation": "defines"
+    },
+    {
+      "source": "class:dronevision/engine/evaluator.py:DroneEvaluator",
+      "target": "func:dronevision/engine/evaluator.py:DroneEvaluator.to_dict",
+      "relation": "defines"
+    },
+    {
+      "source": "class:dronevision/engine/evaluator.py:DroneEvaluator",
+      "target": "func:dronevision/engine/evaluator.py:DroneEvaluator.__str__",
+      "relation": "defines"
+    },
+    {
+      "source": "class:dronevision/engine/evaluator.py:DroneEvaluator",
+      "target": "func:dronevision/engine/evaluator.py:DroneEvaluator.__init__",
+      "relation": "defines"
+    },
+    {
+      "source": "class:dronevision/engine/evaluator.py:DroneEvaluator",
+      "target": "func:dronevision/engine/evaluator.py:DroneEvaluator.reset",
+      "relation": "defines"
+    },
+    {
+      "source": "class:dronevision/engine/evaluator.py:DroneEvaluator",
+      "target": "func:dronevision/engine/evaluator.py:DroneEvaluator.update",
+      "relation": "defines"
+    },
+    {
+      "source": "class:dronevision/engine/evaluator.py:DroneEvaluator",
+      "target": "func:dronevision/engine/evaluator.py:DroneEvaluator.compute",
+      "relation": "defines"
+    },
+    {
+      "source": "class:dronevision/engine/evaluator.py:DroneEvaluator",
+      "target": "func:dronevision/engine/evaluator.py:DroneEvaluator._compute_ap_at_threshold",
+      "relation": "defines"
+    },
+    {
+      "source": "class:dronevision/engine/evaluator.py:DroneEvaluator",
+      "target": "func:dronevision/engine/evaluator.py:DroneEvaluator._compute_ap_continuous",
+      "relation": "defines"
+    },
+    {
+      "source": "file:dronevision/engine/trainer.py",
+      "target": "class:dronevision/engine/trainer.py:DroneTrainer",
+      "relation": "defines"
+    },
+    {
+      "source": "class:dronevision/engine/trainer.py:DroneTrainer",
+      "target": "func:dronevision/engine/trainer.py:DroneTrainer.__init__",
+      "relation": "defines"
+    },
+    {
+      "source": "class:dronevision/engine/trainer.py:DroneTrainer",
+      "target": "func:dronevision/engine/trainer.py:DroneTrainer.train",
+      "relation": "defines"
+    },
+    {
+      "source": "class:dronevision/engine/trainer.py:DroneTrainer",
+      "target": "func:dronevision/engine/trainer.py:DroneTrainer._train_epoch",
+      "relation": "defines"
+    },
+    {
+      "source": "class:dronevision/engine/trainer.py:DroneTrainer",
+      "target": "func:dronevision/engine/trainer.py:DroneTrainer._validate",
+      "relation": "defines"
+    },
+    {
+      "source": "class:dronevision/engine/trainer.py:DroneTrainer",
+      "target": "func:dronevision/engine/trainer.py:DroneTrainer._build_dataloaders",
+      "relation": "defines"
+    },
+    {
+      "source": "class:dronevision/engine/trainer.py:DroneTrainer",
+      "target": "func:dronevision/engine/trainer.py:DroneTrainer._build_model",
+      "relation": "defines"
+    },
+    {
+      "source": "class:dronevision/engine/trainer.py:DroneTrainer",
+      "target": "func:dronevision/engine/trainer.py:DroneTrainer._build_optimizer",
+      "relation": "defines"
+    },
+    {
+      "source": "class:dronevision/engine/trainer.py:DroneTrainer",
+      "target": "func:dronevision/engine/trainer.py:DroneTrainer._resume_from_checkpoint",
+      "relation": "defines"
+    },
+    {
+      "source": "class:dronevision/engine/trainer.py:DroneTrainer",
+      "target": "func:dronevision/engine/trainer.py:DroneTrainer._save_checkpoint",
+      "relation": "defines"
+    },
+    {
+      "source": "class:dronevision/engine/trainer.py:DroneTrainer",
+      "target": "func:dronevision/engine/trainer.py:DroneTrainer._log_hyperparams",
+      "relation": "defines"
+    },
+    {
+      "source": "class:dronevision/engine/trainer.py:DroneTrainer",
+      "target": "func:dronevision/engine/trainer.py:DroneTrainer._log_metrics",
+      "relation": "defines"
+    },
+    {
+      "source": "file:dronevision/engine/trainer.py",
+      "target": "class:dronevision/engine/trainer.py:_MlflowStub",
+      "relation": "defines"
+    },
+    {
+      "source": "class:dronevision/engine/trainer.py:_MlflowStub",
+      "target": "func:dronevision/engine/trainer.py:_MlflowStub.set_tracking_uri",
+      "relation": "defines"
+    },
+    {
+      "source": "class:dronevision/engine/trainer.py:_MlflowStub",
+      "target": "func:dronevision/engine/trainer.py:_MlflowStub.set_experiment",
+      "relation": "defines"
+    },
+    {
+      "source": "class:dronevision/engine/trainer.py:_MlflowStub",
+      "target": "func:dronevision/engine/trainer.py:_MlflowStub.start_run",
+      "relation": "defines"
+    },
+    {
+      "source": "class:dronevision/engine/trainer.py:_MlflowStub",
+      "target": "func:dronevision/engine/trainer.py:_MlflowStub.__enter__",
+      "relation": "defines"
+    },
+    {
+      "source": "class:dronevision/engine/trainer.py:_MlflowStub",
+      "target": "func:dronevision/engine/trainer.py:_MlflowStub.__exit__",
+      "relation": "defines"
+    },
+    {
+      "source": "class:dronevision/engine/trainer.py:_MlflowStub",
+      "target": "func:dronevision/engine/trainer.py:_MlflowStub.log_params",
+      "relation": "defines"
+    },
+    {
+      "source": "class:dronevision/engine/trainer.py:_MlflowStub",
+      "target": "func:dronevision/engine/trainer.py:_MlflowStub.log_metric",
+      "relation": "defines"
+    },
+    {
+      "source": "file:dronevision/engine/__init__.py",
+      "target": "func:dronevision/engine/__init__.py:__getattr__",
+      "relation": "defines"
+    },
+    {
+      "source": "file:dronevision/inference/nms.py",
+      "target": "func:dronevision/inference/nms.py:non_max_suppression",
+      "relation": "defines"
+    },
+    {
+      "source": "file:dronevision/inference/nms.py",
+      "target": "func:dronevision/inference/nms.py:_nms",
+      "relation": "defines"
+    },
+    {
+      "source": "file:dronevision/inference/nms.py",
+      "target": "func:dronevision/inference/nms.py:_box_iou",
+      "relation": "defines"
+    },
+    {
+      "source": "file:dronevision/inference/predictor.py",
+      "target": "class:dronevision/inference/predictor.py:DronePredictor",
+      "relation": "defines"
+    },
+    {
+      "source": "class:dronevision/inference/predictor.py:DronePredictor",
+      "target": "func:dronevision/inference/predictor.py:DronePredictor.__init__",
+      "relation": "defines"
+    },
+    {
+      "source": "class:dronevision/inference/predictor.py:DronePredictor",
+      "target": "func:dronevision/inference/predictor.py:DronePredictor.from_checkpoint",
+      "relation": "defines"
+    },
+    {
+      "source": "class:dronevision/inference/predictor.py:DronePredictor",
+      "target": "func:dronevision/inference/predictor.py:DronePredictor.predict_image",
+      "relation": "defines"
+    },
+    {
+      "source": "class:dronevision/inference/predictor.py:DronePredictor",
+      "target": "func:dronevision/inference/predictor.py:DronePredictor.predict_batch",
+      "relation": "defines"
+    },
+    {
+      "source": "file:dronevision/inference/visualizer.py",
+      "target": "func:dronevision/inference/visualizer.py:draw_detections",
+      "relation": "defines"
+    },
+    {
+      "source": "file:dronevision/inference/visualizer.py",
+      "target": "func:dronevision/inference/visualizer.py:save_annotated_image",
+      "relation": "defines"
+    },
+    {
+      "source": "file:dronevision/loss/detection_loss.py",
+      "target": "class:dronevision/loss/detection_loss.py:DroneDetectionLoss",
+      "relation": "defines"
+    },
+    {
+      "source": "class:dronevision/loss/detection_loss.py:DroneDetectionLoss",
+      "target": "func:dronevision/loss/detection_loss.py:DroneDetectionLoss.__init__",
+      "relation": "defines"
+    },
+    {
+      "source": "class:dronevision/loss/detection_loss.py:DroneDetectionLoss",
+      "target": "func:dronevision/loss/detection_loss.py:DroneDetectionLoss.forward",
+      "relation": "defines"
+    },
+    {
+      "source": "class:dronevision/loss/detection_loss.py:DroneDetectionLoss",
+      "target": "func:dronevision/loss/detection_loss.py:DroneDetectionLoss._decode_box",
+      "relation": "defines"
+    },
+    {
+      "source": "class:dronevision/loss/detection_loss.py:DroneDetectionLoss",
+      "target": "func:dronevision/loss/detection_loss.py:DroneDetectionLoss._build_targets",
+      "relation": "defines"
+    },
+    {
+      "source": "file:dronevision/loss/iou_loss.py",
+      "target": "func:dronevision/loss/iou_loss.py:_cxcywh_to_xyxy",
+      "relation": "defines"
+    },
+    {
+      "source": "file:dronevision/loss/iou_loss.py",
+      "target": "func:dronevision/loss/iou_loss.py:compute_iou",
+      "relation": "defines"
+    },
+    {
+      "source": "file:dronevision/loss/iou_loss.py",
+      "target": "func:dronevision/loss/iou_loss.py:compute_ciou",
+      "relation": "defines"
+    },
+    {
+      "source": "file:dronevision/loss/iou_loss.py",
+      "target": "func:dronevision/loss/iou_loss.py:ciou_loss",
+      "relation": "defines"
+    },
+    {
+      "source": "file:dronevision/models/backbone.py",
+      "target": "class:dronevision/models/backbone.py:DroneBackbone",
+      "relation": "defines"
+    },
+    {
+      "source": "class:dronevision/models/backbone.py:DroneBackbone",
+      "target": "func:dronevision/models/backbone.py:DroneBackbone.__init__",
+      "relation": "defines"
+    },
+    {
+      "source": "class:dronevision/models/backbone.py:DroneBackbone",
+      "target": "func:dronevision/models/backbone.py:DroneBackbone._log_info",
+      "relation": "defines"
+    },
+    {
+      "source": "class:dronevision/models/backbone.py:DroneBackbone",
+      "target": "func:dronevision/models/backbone.py:DroneBackbone.forward",
+      "relation": "defines"
+    },
+    {
+      "source": "file:dronevision/models/blocks.py",
+      "target": "class:dronevision/models/blocks.py:CBS",
+      "relation": "defines"
+    },
+    {
+      "source": "file:dronevision/models/blocks.py",
+      "target": "class:dronevision/models/blocks.py:Bottleneck",
+      "relation": "defines"
+    },
+    {
+      "source": "file:dronevision/models/blocks.py",
+      "target": "class:dronevision/models/blocks.py:SPPF",
+      "relation": "defines"
+    },
+    {
+      "source": "class:dronevision/models/blocks.py:SPPF",
+      "target": "func:dronevision/models/blocks.py:SPPF.__init__",
+      "relation": "defines"
+    },
+    {
+      "source": "class:dronevision/models/blocks.py:SPPF",
+      "target": "func:dronevision/models/blocks.py:SPPF.forward",
+      "relation": "defines"
+    },
+    {
+      "source": "class:dronevision/models/blocks.py:SPPF",
+      "target": "func:dronevision/models/blocks.py:SPPF.__init__",
+      "relation": "defines"
+    },
+    {
+      "source": "class:dronevision/models/blocks.py:SPPF",
+      "target": "func:dronevision/models/blocks.py:SPPF.forward",
+      "relation": "defines"
+    },
+    {
+      "source": "class:dronevision/models/blocks.py:SPPF",
+      "target": "func:dronevision/models/blocks.py:SPPF.__init__",
+      "relation": "defines"
+    },
+    {
+      "source": "class:dronevision/models/blocks.py:SPPF",
+      "target": "func:dronevision/models/blocks.py:SPPF.forward",
+      "relation": "defines"
+    },
+    {
+      "source": "file:dronevision/models/detector.py",
+      "target": "class:dronevision/models/detector.py:DroneDetector",
+      "relation": "defines"
+    },
+    {
+      "source": "class:dronevision/models/detector.py:DroneDetector",
+      "target": "func:dronevision/models/detector.py:DroneDetector.__init__",
+      "relation": "defines"
+    },
+    {
+      "source": "class:dronevision/models/detector.py:DroneDetector",
+      "target": "func:dronevision/models/detector.py:DroneDetector._log_summary",
+      "relation": "defines"
+    },
+    {
+      "source": "class:dronevision/models/detector.py:DroneDetector",
+      "target": "func:dronevision/models/detector.py:DroneDetector.forward",
+      "relation": "defines"
+    },
+    {
+      "source": "class:dronevision/models/detector.py:DroneDetector",
+      "target": "func:dronevision/models/detector.py:DroneDetector._decode",
+      "relation": "defines"
+    },
+    {
+      "source": "class:dronevision/models/detector.py:DroneDetector",
+      "target": "func:dronevision/models/detector.py:DroneDetector.count_parameters",
+      "relation": "defines"
+    },
+    {
+      "source": "class:dronevision/models/detector.py:DroneDetector",
+      "target": "func:dronevision/models/detector.py:DroneDetector.save_checkpoint",
+      "relation": "defines"
+    },
+    {
+      "source": "class:dronevision/models/detector.py:DroneDetector",
+      "target": "func:dronevision/models/detector.py:DroneDetector.load_checkpoint",
+      "relation": "defines"
+    },
+    {
+      "source": "file:dronevision/models/head.py",
+      "target": "class:dronevision/models/head.py:DetectionScale",
+      "relation": "defines"
+    },
+    {
+      "source": "file:dronevision/models/head.py",
+      "target": "class:dronevision/models/head.py:DroneHead",
+      "relation": "defines"
+    },
+    {
+      "source": "class:dronevision/models/head.py:DroneHead",
+      "target": "func:dronevision/models/head.py:DroneHead.__init__",
+      "relation": "defines"
+    },
+    {
+      "source": "class:dronevision/models/head.py:DroneHead",
+      "target": "func:dronevision/models/head.py:DroneHead._init_biases",
+      "relation": "defines"
+    },
+    {
+      "source": "class:dronevision/models/head.py:DroneHead",
+      "target": "func:dronevision/models/head.py:DroneHead.forward",
+      "relation": "defines"
+    },
+    {
+      "source": "class:dronevision/models/head.py:DroneHead",
+      "target": "func:dronevision/models/head.py:DroneHead.__init__",
+      "relation": "defines"
+    },
+    {
+      "source": "class:dronevision/models/head.py:DroneHead",
+      "target": "func:dronevision/models/head.py:DroneHead.forward",
+      "relation": "defines"
+    },
+    {
+      "source": "file:dronevision/models/neck.py",
+      "target": "class:dronevision/models/neck.py:DroneNeck",
+      "relation": "defines"
+    },
+    {
+      "source": "class:dronevision/models/neck.py:DroneNeck",
+      "target": "func:dronevision/models/neck.py:DroneNeck.__init__",
+      "relation": "defines"
+    },
+    {
+      "source": "class:dronevision/models/neck.py:DroneNeck",
+      "target": "func:dronevision/models/neck.py:DroneNeck._log_info",
+      "relation": "defines"
+    },
+    {
+      "source": "class:dronevision/models/neck.py:DroneNeck",
+      "target": "func:dronevision/models/neck.py:DroneNeck.forward",
+      "relation": "defines"
+    },
+    {
+      "source": "file:dronevision/utils/anchors.py",
+      "target": "func:dronevision/utils/anchors.py:build_anchor_tensor",
+      "relation": "defines"
+    },
+    {
+      "source": "file:dronevision/utils/anchors.py",
+      "target": "func:dronevision/utils/anchors.py:make_grid",
+      "relation": "defines"
+    },
+    {
+      "source": "file:dronevision/utils/anchors.py",
+      "target": "func:dronevision/utils/anchors.py:decode_predictions",
+      "relation": "defines"
+    },
+    {
+      "source": "file:dronevision/utils/anchors.py",
+      "target": "func:dronevision/utils/anchors.py:suggest_anchors_kmeans",
+      "relation": "defines"
+    },
+    {
+      "source": "file:dronevision/utils/anchors.py",
+      "target": "func:dronevision/utils/anchors.py:_wh_iou_distance",
+      "relation": "defines"
+    },
+    {
+      "source": "file:dronevision/utils/bbox.py",
+      "target": "func:dronevision/utils/bbox.py:cxcywh_to_xyxy",
+      "relation": "defines"
+    },
+    {
+      "source": "file:dronevision/utils/bbox.py",
+      "target": "func:dronevision/utils/bbox.py:xyxy_to_cxcywh",
+      "relation": "defines"
+    },
+    {
+      "source": "file:dronevision/utils/bbox.py",
+      "target": "func:dronevision/utils/bbox.py:yolo_to_xyxy",
+      "relation": "defines"
+    },
+    {
+      "source": "file:dronevision/utils/bbox.py",
+      "target": "func:dronevision/utils/bbox.py:xyxy_to_yolo",
+      "relation": "defines"
+    },
+    {
+      "source": "file:dronevision/utils/bbox.py",
+      "target": "func:dronevision/utils/bbox.py:compute_iou_xyxy",
+      "relation": "defines"
+    },
+    {
+      "source": "file:dronevision/utils/bbox.py",
+      "target": "func:dronevision/utils/bbox.py:compute_iou_matrix",
+      "relation": "defines"
+    },
+    {
+      "source": "file:dronevision/utils/bbox.py",
+      "target": "func:dronevision/utils/bbox.py:clip_boxes_to_image",
+      "relation": "defines"
+    },
+    {
+      "source": "file:dronevision/utils/bbox.py",
+      "target": "func:dronevision/utils/bbox.py:filter_small_boxes",
+      "relation": "defines"
+    },
+    {
+      "source": "file:dronevision/utils/config.py",
+      "target": "class:dronevision/utils/config.py:ConfigError",
+      "relation": "defines"
+    },
+    {
+      "source": "class:dronevision/utils/config.py:ConfigError",
+      "target": "func:dronevision/utils/config.py:ConfigError.load_config",
+      "relation": "defines"
+    },
+    {
+      "source": "class:dronevision/utils/config.py:ConfigError",
+      "target": "func:dronevision/utils/config.py:ConfigError._validate_config",
+      "relation": "defines"
+    },
+    {
+      "source": "class:dronevision/utils/config.py:ConfigError",
+      "target": "func:dronevision/utils/config.py:ConfigError._apply_defaults",
+      "relation": "defines"
+    },
+    {
+      "source": "file:dronevision/utils/logger.py",
+      "target": "func:dronevision/utils/logger.py:configure_logging",
+      "relation": "defines"
+    },
+    {
+      "source": "file:dronevision/utils/logger.py",
+      "target": "func:dronevision/utils/logger.py:get_logger",
+      "relation": "defines"
+    },
+    {
+      "source": "file:dronevision/utils/reproducibility.py",
+      "target": "func:dronevision/utils/reproducibility.py:set_seed",
+      "relation": "defines"
+    },
+    {
+      "source": "file:dronevision/utils/reproducibility.py",
+      "target": "func:dronevision/utils/reproducibility.py:get_device",
+      "relation": "defines"
+    }
+  ]
+}

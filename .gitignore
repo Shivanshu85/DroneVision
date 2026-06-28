@@ -1,0 +1,92 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+.ruff_cache/
+
+# Virtual environments
+venv/
+env/
+.env/
+.venv/
+venv_cuda/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Dataset (large binary files — use DVC)
+datasets/
+!datasets/.gitkeep
+
+# Training outputs (large binary checkpoints)
+runs/*
+!runs/phase1/
+runs/phase1/*
+!runs/phase1/best.pth
+!runs/.gitkeep
+
+
+# MLflow tracking data
+mlruns/
+!mlruns/.gitkeep
+
+# DVC cache
+.dvc/cache/
+.dvc/tmp/
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Model weights (not tracked by git — use LFS for best.pth)
+*.pth
+!runs/phase1/best.pth
+*.pt
+*.onnx
+
+# Test cache
+.pytest_cache/
+.coverage
+htmlcov/
+
+# MyPy
+.mypy_cache/
+
+# Ignore all markdown files by default
+*.md
+docs/**/*.md
+
+# Except README.md and essential showcase documentation
+!README.md
+!DEPLOYMENT.md
+!CONTRIBUTING.md
+!CHANGELOG.md
+!SECURITY.md
+!CODE_OF_CONDUCT.md
+
+# Non-essential root files and reports
+/*.json
+/repomix-output.xml
+/project_memory.db
+/.repomixignore
+/dataset/
+
+

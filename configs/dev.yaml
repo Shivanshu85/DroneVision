@@ -1,0 +1,83 @@
+# =============================================================================
+# DroneVision — Development Configuration
+# Purpose : Pipeline verification (fast iteration, small batch)
+# Image   : 416x416
+# Batch   : 8
+# Epochs  : 10
+# =============================================================================
+
+model:
+  image_size: 416
+  num_classes: 1                  # 0 = Drone (UAV)
+  num_anchors: 3                  # anchors per scale
+  strides: [8, 16, 32]           # detection scale strides
+
+  # Anchors tuned for DUT Anti-UAV at 416x416 image size.
+  # 3 groups (one per detection scale), 3 anchor (w,h) pairs each.
+  # Units: pixels in the 416x416 input space.
+  # Refine with: python scripts/analyze_dataset.py --suggest-anchors
+  anchors:
+    - [[4, 4],   [7, 7],    [11, 11]]    # P3 stride-8  — very small drones
+    - [[16, 16], [25, 25],  [37, 37]]    # P4 stride-16 — medium drones
+    - [[52, 52], [72, 72],  [104, 104]]  # P5 stride-32 — large/close drones
+
+  # Backbone channels (small, ~2M total params)
+  backbone_channels: [32, 64, 128, 256]
+
+  # Neck output channels per scale
+  neck_channels: [64, 128, 128]   # N3, N4, N5
+
+data:
+  train: datasets/images/train
+  val:   datasets/images/val
+  test:  datasets/images/test
+  label_dir: datasets/labels
+  num_workers: 0          # 0 = main process only (required on Windows)
+  pin_memory: true        # enabled: CUDA GPU available
+
+  # Class name mapping (original VOC → canonical)
+  class_names:
+    0: "drone"
+
+augmentation:
+  enabled: true
+  horizontal_flip: 0.5
+  vertical_flip:   0.3
+  color_jitter:    0.8
+  mosaic:          0.5
+  mixup:           0.1
+  random_scale:    0.5
+  gaussian_blur:   0.2
+
+train:
+  epochs: 10
+  batch_size: 8
+  optimizer: adamw
+  lr: 0.001
+  weight_decay: 0.0005
+  momentum: 0.937           # used if optimizer=sgd
+  warmup_epochs: 1
+  scheduler: cosine
+  mixed_precision: true     # enabled: RTX 3050 CUDA GPU available
+  gradient_clip: 10.0
+  seed: 42
+  checkpoint_dir: runs/dev
+  save_period: 2            # save checkpoint every 2 epochs
+  patience: 20              # early stopping patience
+
+loss:
+  lambda_box: 7.5
+  lambda_obj: 1.0
+  lambda_cls: 0.5
+  anchor_threshold: 4.0     # max anchor/GT aspect ratio
+  obj_pos_weight: 1.0       # BCE positive weight for objectness
+  cls_pos_weight: 1.0       # BCE positive weight for class
+
+inference:
+  conf_threshold: 0.25
+  iou_threshold:  0.45      # NMS IoU threshold
+
+logging:
+  mlflow_tracking_uri: sqlite:///mlruns/mlflow.db
+  experiment_name: dronevision_dev
+  log_interval: 10          # log every N batches

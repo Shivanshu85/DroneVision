@@ -1,0 +1,939 @@
+{
+  "nodes": [
+    {
+      "id": "tqdm",
+      "type": "external"
+    },
+    {
+      "id": "dronevision/engine/trainer.py",
+      "type": "module"
+    },
+    {
+      "id": "dronevision/utils/anchors.py",
+      "type": "module"
+    },
+    {
+      "id": "torch.nn.functional",
+      "type": "external"
+    },
+    {
+      "id": "dronevision/utils/bbox.py",
+      "type": "module"
+    },
+    {
+      "id": "dronevision/models/backbone.py",
+      "type": "module"
+    },
+    {
+      "id": "numpy",
+      "type": "external"
+    },
+    {
+      "id": "pathlib",
+      "type": "external"
+    },
+    {
+      "id": "math",
+      "type": "external"
+    },
+    {
+      "id": "dronevision/engine/evaluator.py",
+      "type": "module"
+    },
+    {
+      "id": "dronevision/inference/predictor.py",
+      "type": "module"
+    },
+    {
+      "id": "dronevision/data/dataset.py",
+      "type": "module"
+    },
+    {
+      "id": "dronevision/inference/__init__.py",
+      "type": "module"
+    },
+    {
+      "id": "dronevision/models/blocks.py",
+      "type": "module"
+    },
+    {
+      "id": "torch.utils.data",
+      "type": "external"
+    },
+    {
+      "id": "dronevision/inference/nms.py",
+      "type": "module"
+    },
+    {
+      "id": "json",
+      "type": "external"
+    },
+    {
+      "id": "dataclasses",
+      "type": "external"
+    },
+    {
+      "id": "dronevision/models/__init__.py",
+      "type": "module"
+    },
+    {
+      "id": "yaml",
+      "type": "external"
+    },
+    {
+      "id": "sys",
+      "type": "external"
+    },
+    {
+      "id": "cv2",
+      "type": "external"
+    },
+    {
+      "id": "torch.optim.lr_scheduler",
+      "type": "external"
+    },
+    {
+      "id": "dronevision/loss/detection_loss.py",
+      "type": "module"
+    },
+    {
+      "id": "dronevision/loss/__init__.py",
+      "type": "module"
+    },
+    {
+      "id": "shutil",
+      "type": "external"
+    },
+    {
+      "id": "dronevision/engine/__init__.py",
+      "type": "module"
+    },
+    {
+      "id": "dronevision/data/collate.py",
+      "type": "module"
+    },
+    {
+      "id": "typing",
+      "type": "external"
+    },
+    {
+      "id": "xml.etree.ElementTree",
+      "type": "external"
+    },
+    {
+      "id": "dronevision/utils/__init__.py",
+      "type": "module"
+    },
+    {
+      "id": "dronevision/__init__.py",
+      "type": "module"
+    },
+    {
+      "id": "dronevision/utils/reproducibility.py",
+      "type": "module"
+    },
+    {
+      "id": "logging",
+      "type": "external"
+    },
+    {
+      "id": "__future__",
+      "type": "external"
+    },
+    {
+      "id": "mlflow",
+      "type": "external"
+    },
+    {
+      "id": "dronevision/engine/callbacks.py",
+      "type": "module"
+    },
+    {
+      "id": "dronevision/models/detector.py",
+      "type": "module"
+    },
+    {
+      "id": "dronevision/data/__init__.py",
+      "type": "module"
+    },
+    {
+      "id": "dronevision/data/augmentation.py",
+      "type": "module"
+    },
+    {
+      "id": "dronevision/loss/iou_loss.py",
+      "type": "module"
+    },
+    {
+      "id": "os",
+      "type": "external"
+    },
+    {
+      "id": "random",
+      "type": "external"
+    },
+    {
+      "id": "dronevision/models/neck.py",
+      "type": "module"
+    },
+    {
+      "id": "torch.nn",
+      "type": "external"
+    },
+    {
+      "id": "torch",
+      "type": "external"
+    },
+    {
+      "id": "dronevision/models/head.py",
+      "type": "module"
+    },
+    {
+      "id": "dronevision/inference/visualizer.py",
+      "type": "module"
+    },
+    {
+      "id": "dronevision/data/transforms.py",
+      "type": "module"
+    },
+    {
+      "id": "dronevision/utils/logger.py",
+      "type": "module"
+    },
+    {
+      "id": "dronevision/data/converter.py",
+      "type": "module"
+    },
+    {
+      "id": "dronevision/utils/config.py",
+      "type": "module"
+    }
+  ],
+  "edges": [
+    {
+      "source": "dronevision/data/augmentation.py",
+      "target": "__future__",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/data/augmentation.py",
+      "target": "random",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/data/augmentation.py",
+      "target": "cv2",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/data/augmentation.py",
+      "target": "numpy",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/data/augmentation.py",
+      "target": "dronevision/data/transforms.py",
+      "type": "internal_import"
+    },
+    {
+      "source": "dronevision/data/collate.py",
+      "target": "__future__",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/data/collate.py",
+      "target": "torch",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/data/converter.py",
+      "target": "__future__",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/data/converter.py",
+      "target": "json",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/data/converter.py",
+      "target": "shutil",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/data/converter.py",
+      "target": "xml.etree.ElementTree",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/data/converter.py",
+      "target": "dataclasses",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/data/converter.py",
+      "target": "pathlib",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/data/converter.py",
+      "target": "typing",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/data/converter.py",
+      "target": "dronevision/utils/logger.py",
+      "type": "internal_import"
+    },
+    {
+      "source": "dronevision/data/dataset.py",
+      "target": "__future__",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/data/dataset.py",
+      "target": "pathlib",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/data/dataset.py",
+      "target": "typing",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/data/dataset.py",
+      "target": "cv2",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/data/dataset.py",
+      "target": "numpy",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/data/dataset.py",
+      "target": "torch",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/data/dataset.py",
+      "target": "torch.utils.data",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/data/dataset.py",
+      "target": "dronevision/data/augmentation.py",
+      "type": "internal_import"
+    },
+    {
+      "source": "dronevision/data/dataset.py",
+      "target": "dronevision/data/transforms.py",
+      "type": "internal_import"
+    },
+    {
+      "source": "dronevision/data/dataset.py",
+      "target": "dronevision/utils/logger.py",
+      "type": "internal_import"
+    },
+    {
+      "source": "dronevision/data/transforms.py",
+      "target": "__future__",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/data/transforms.py",
+      "target": "cv2",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/data/transforms.py",
+      "target": "numpy",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/data/__init__.py",
+      "target": "dronevision/data/dataset.py",
+      "type": "internal_import"
+    },
+    {
+      "source": "dronevision/data/__init__.py",
+      "target": "dronevision/data/collate.py",
+      "type": "internal_import"
+    },
+    {
+      "source": "dronevision/engine/callbacks.py",
+      "target": "__future__",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/engine/callbacks.py",
+      "target": "math",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/engine/callbacks.py",
+      "target": "torch",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/engine/callbacks.py",
+      "target": "torch.optim.lr_scheduler",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/engine/callbacks.py",
+      "target": "dronevision/utils/logger.py",
+      "type": "internal_import"
+    },
+    {
+      "source": "dronevision/engine/evaluator.py",
+      "target": "__future__",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/engine/evaluator.py",
+      "target": "dataclasses",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/engine/evaluator.py",
+      "target": "typing",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/engine/evaluator.py",
+      "target": "numpy",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/engine/evaluator.py",
+      "target": "torch",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/engine/evaluator.py",
+      "target": "dronevision/utils/bbox.py",
+      "type": "internal_import"
+    },
+    {
+      "source": "dronevision/engine/evaluator.py",
+      "target": "dronevision/utils/logger.py",
+      "type": "internal_import"
+    },
+    {
+      "source": "dronevision/engine/trainer.py",
+      "target": "__future__",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/engine/trainer.py",
+      "target": "pathlib",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/engine/trainer.py",
+      "target": "typing",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/engine/trainer.py",
+      "target": "torch",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/engine/trainer.py",
+      "target": "torch.nn",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/engine/trainer.py",
+      "target": "torch.utils.data",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/engine/trainer.py",
+      "target": "tqdm",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/engine/trainer.py",
+      "target": "dronevision/data/collate.py",
+      "type": "internal_import"
+    },
+    {
+      "source": "dronevision/engine/trainer.py",
+      "target": "dronevision/data/dataset.py",
+      "type": "internal_import"
+    },
+    {
+      "source": "dronevision/engine/trainer.py",
+      "target": "dronevision/engine/callbacks.py",
+      "type": "internal_import"
+    },
+    {
+      "source": "dronevision/engine/trainer.py",
+      "target": "dronevision/engine/evaluator.py",
+      "type": "internal_import"
+    },
+    {
+      "source": "dronevision/engine/trainer.py",
+      "target": "dronevision/inference/nms.py",
+      "type": "internal_import"
+    },
+    {
+      "source": "dronevision/engine/trainer.py",
+      "target": "dronevision/loss/detection_loss.py",
+      "type": "internal_import"
+    },
+    {
+      "source": "dronevision/engine/trainer.py",
+      "target": "dronevision/models/detector.py",
+      "type": "internal_import"
+    },
+    {
+      "source": "dronevision/engine/trainer.py",
+      "target": "dronevision/utils/logger.py",
+      "type": "internal_import"
+    },
+    {
+      "source": "dronevision/engine/trainer.py",
+      "target": "dronevision/utils/reproducibility.py",
+      "type": "internal_import"
+    },
+    {
+      "source": "dronevision/engine/trainer.py",
+      "target": "mlflow",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/engine/__init__.py",
+      "target": "__future__",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/engine/__init__.py",
+      "target": "dronevision/engine/trainer.py",
+      "type": "internal_import"
+    },
+    {
+      "source": "dronevision/engine/__init__.py",
+      "target": "dronevision/engine/evaluator.py",
+      "type": "internal_import"
+    },
+    {
+      "source": "dronevision/inference/nms.py",
+      "target": "__future__",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/inference/nms.py",
+      "target": "numpy",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/inference/nms.py",
+      "target": "torch",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/inference/nms.py",
+      "target": "dronevision/utils/logger.py",
+      "type": "internal_import"
+    },
+    {
+      "source": "dronevision/inference/predictor.py",
+      "target": "__future__",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/inference/predictor.py",
+      "target": "pathlib",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/inference/predictor.py",
+      "target": "typing",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/inference/predictor.py",
+      "target": "cv2",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/inference/predictor.py",
+      "target": "numpy",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/inference/predictor.py",
+      "target": "torch",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/inference/predictor.py",
+      "target": "dronevision/data/transforms.py",
+      "type": "internal_import"
+    },
+    {
+      "source": "dronevision/inference/predictor.py",
+      "target": "dronevision/inference/nms.py",
+      "type": "internal_import"
+    },
+    {
+      "source": "dronevision/inference/predictor.py",
+      "target": "dronevision/models/detector.py",
+      "type": "internal_import"
+    },
+    {
+      "source": "dronevision/inference/predictor.py",
+      "target": "dronevision/utils/logger.py",
+      "type": "internal_import"
+    },
+    {
+      "source": "dronevision/inference/visualizer.py",
+      "target": "__future__",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/inference/visualizer.py",
+      "target": "cv2",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/inference/visualizer.py",
+      "target": "numpy",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/inference/__init__.py",
+      "target": "dronevision/inference/predictor.py",
+      "type": "internal_import"
+    },
+    {
+      "source": "dronevision/inference/__init__.py",
+      "target": "dronevision/inference/nms.py",
+      "type": "internal_import"
+    },
+    {
+      "source": "dronevision/loss/detection_loss.py",
+      "target": "__future__",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/loss/detection_loss.py",
+      "target": "typing",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/loss/detection_loss.py",
+      "target": "torch",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/loss/detection_loss.py",
+      "target": "torch.nn",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/loss/detection_loss.py",
+      "target": "dronevision/loss/iou_loss.py",
+      "type": "internal_import"
+    },
+    {
+      "source": "dronevision/loss/detection_loss.py",
+      "target": "dronevision/utils/logger.py",
+      "type": "internal_import"
+    },
+    {
+      "source": "dronevision/loss/iou_loss.py",
+      "target": "__future__",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/loss/iou_loss.py",
+      "target": "math",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/loss/iou_loss.py",
+      "target": "torch",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/loss/__init__.py",
+      "target": "dronevision/loss/detection_loss.py",
+      "type": "internal_import"
+    },
+    {
+      "source": "dronevision/models/backbone.py",
+      "target": "__future__",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/models/backbone.py",
+      "target": "torch",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/models/backbone.py",
+      "target": "torch.nn",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/models/backbone.py",
+      "target": "dronevision/models/blocks.py",
+      "type": "internal_import"
+    },
+    {
+      "source": "dronevision/models/backbone.py",
+      "target": "dronevision/utils/logger.py",
+      "type": "internal_import"
+    },
+    {
+      "source": "dronevision/models/blocks.py",
+      "target": "__future__",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/models/blocks.py",
+      "target": "torch",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/models/blocks.py",
+      "target": "torch.nn",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/models/detector.py",
+      "target": "__future__",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/models/detector.py",
+      "target": "pathlib",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/models/detector.py",
+      "target": "typing",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/models/detector.py",
+      "target": "torch",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/models/detector.py",
+      "target": "torch.nn",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/models/detector.py",
+      "target": "dronevision/models/backbone.py",
+      "type": "internal_import"
+    },
+    {
+      "source": "dronevision/models/detector.py",
+      "target": "dronevision/models/head.py",
+      "type": "internal_import"
+    },
+    {
+      "source": "dronevision/models/detector.py",
+      "target": "dronevision/models/neck.py",
+      "type": "internal_import"
+    },
+    {
+      "source": "dronevision/models/detector.py",
+      "target": "dronevision/utils/anchors.py",
+      "type": "internal_import"
+    },
+    {
+      "source": "dronevision/models/detector.py",
+      "target": "dronevision/utils/logger.py",
+      "type": "internal_import"
+    },
+    {
+      "source": "dronevision/models/head.py",
+      "target": "__future__",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/models/head.py",
+      "target": "torch",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/models/head.py",
+      "target": "torch.nn",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/models/head.py",
+      "target": "dronevision/models/blocks.py",
+      "type": "internal_import"
+    },
+    {
+      "source": "dronevision/models/head.py",
+      "target": "dronevision/utils/logger.py",
+      "type": "internal_import"
+    },
+    {
+      "source": "dronevision/models/head.py",
+      "target": "math",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/models/neck.py",
+      "target": "__future__",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/models/neck.py",
+      "target": "torch",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/models/neck.py",
+      "target": "torch.nn",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/models/neck.py",
+      "target": "torch.nn.functional",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/models/neck.py",
+      "target": "dronevision/models/blocks.py",
+      "type": "internal_import"
+    },
+    {
+      "source": "dronevision/models/neck.py",
+      "target": "dronevision/utils/logger.py",
+      "type": "internal_import"
+    },
+    {
+      "source": "dronevision/models/__init__.py",
+      "target": "dronevision/models/detector.py",
+      "type": "internal_import"
+    },
+    {
+      "source": "dronevision/utils/anchors.py",
+      "target": "__future__",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/utils/anchors.py",
+      "target": "torch",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/utils/anchors.py",
+      "target": "numpy",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/utils/bbox.py",
+      "target": "__future__",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/utils/bbox.py",
+      "target": "torch",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/utils/bbox.py",
+      "target": "numpy",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/utils/config.py",
+      "target": "__future__",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/utils/config.py",
+      "target": "pathlib",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/utils/config.py",
+      "target": "typing",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/utils/config.py",
+      "target": "yaml",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/utils/config.py",
+      "target": "dronevision/utils/logger.py",
+      "type": "internal_import"
+    },
+    {
+      "source": "dronevision/utils/logger.py",
+      "target": "logging",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/utils/logger.py",
+      "target": "sys",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/utils/logger.py",
+      "target": "pathlib",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/utils/reproducibility.py",
+      "target": "__future__",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/utils/reproducibility.py",
+      "target": "os",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/utils/reproducibility.py",
+      "target": "random",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/utils/reproducibility.py",
+      "target": "numpy",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/utils/reproducibility.py",
+      "target": "torch",
+      "type": "external_import"
+    },
+    {
+      "source": "dronevision/utils/reproducibility.py",
+      "target": "dronevision/utils/logger.py",
+      "type": "internal_import"
+    },
+    {
+      "source": "dronevision/utils/__init__.py",
+      "target": "dronevision/utils/logger.py",
+      "type": "internal_import"
+    },
+    {
+      "source": "dronevision/utils/__init__.py",
+      "target": "dronevision/utils/config.py",
+      "type": "internal_import"
+    },
+    {
+      "source": "dronevision/utils/__init__.py",
+      "target": "dronevision/utils/reproducibility.py",
+      "type": "internal_import"
+    }
+  ]
+}

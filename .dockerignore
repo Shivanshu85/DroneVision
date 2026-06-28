@@ -1,0 +1,52 @@
+# Ignore git directory
+.git/
+.github/
+
+# Ignore python cache files
+**/__pycache__/
+**/*.py[cod]
+**/*.pyo
+**/*.pyd
+
+# Ignore virtual environments
+venv/
+env/
+.env/
+.venv/
+venv_cuda/
+
+# Ignore local config files
+.env
+
+# Ignore datasets
+datasets/
+dataset/
+
+# Ignore training outputs except the required production weights
+runs/*
+!runs/phase1/
+runs/phase1/*
+!runs/phase1/best.pth
+
+# Ignore experiment tracking logs
+mlruns/
+
+# Ignore test and tool caches
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+.editorconfig
+.pre-commit-config.yaml
+.dvc/
+.dvcignore
+
+# Ignore packaging builds
+build/
+dist/
+*.egg-info/
+
+# Ignore documentation files not needed in container
+docs/
+*.md
