@@ -1,7 +1,7 @@
 # DroneVision MVP Demo Application Dependencies
 gradio>=6.19.0
 opencv-python>=4.9.0
-Pillow>=10.3.0
+Pillow>=12.2.0
 numpy>=1.26.0
 pyyaml>=6.0.1
 torch>=2.2.0
