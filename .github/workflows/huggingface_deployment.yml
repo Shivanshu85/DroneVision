@@ -45,7 +45,6 @@ jobs:
           cp -r dronevision hf_space/
           cp -r demo hf_space/
           cp -r configs hf_space/
-          cp -r requirements hf_space/
           
           echo "Re-creating checkpoint paths and copying best.pth..."
           mkdir -p hf_space/runs/phase1
@@ -53,9 +52,23 @@ jobs:
           
           echo "Copying root files and gitattributes..."
           cp app.py hf_space/
-          cp requirements.txt hf_space/
           cp VERSION hf_space/
           cp .gitattributes hf_space/
+
+          echo "Generating flat, self-contained requirements.txt for Hugging Face Spaces..."
+          cat << 'EOF' > hf_space/requirements.txt
+          torch>=2.2.0
+          torchvision>=0.17.0
+          numpy>=1.26.0
+          opencv-python-headless>=4.9.0
+          Pillow>=10.3.0
+          pyyaml>=6.0.1
+          scipy>=1.13.0
+          tqdm>=4.66.4
+          gradio>=6.19.0
+          fastapi>=0.111.0
+          uvicorn>=0.29.0
+          EOF
 
           echo "Creating packages.txt for system dependencies..."
           cat << 'EOF' > hf_space/packages.txt
@@ -81,6 +94,34 @@ jobs:
           Custom single-class drone detection and counting system built entirely from scratch with PyTorch.
           EOF
           echo "Demo isolation process successfully completed."
+
+      - name: Validate Space Deployment Package
+        run: |
+          echo "Validating isolated space contents..."
+          
+          # Check for essential files
+          for f in hf_space/app.py hf_space/README.md hf_space/requirements.txt hf_space/packages.txt hf_space/VERSION hf_space/.gitattributes hf_space/runs/phase1/best.pth; do
+            if [ ! -f "$f" ]; then
+              echo "Error: Validation failed! Missing required file: $f"
+              exit 1
+            fi
+          done
+          
+          # Check for essential directories
+          for d in hf_space/dronevision hf_space/demo hf_space/configs; do
+            if [ ! -d "$d" ]; then
+              echo "Error: Validation failed! Missing required directory: $d"
+              exit 1
+            fi
+          done
+          
+          # Check for nested requirement references in the generated file
+          if grep -q "\-r " hf_space/requirements.txt; then
+            echo "Error: Validation failed! Generated requirements.txt contains nested '-r' references."
+            exit 1
+          fi
+          
+          echo "Validation succeeded! Space deployment package is complete and optimized."
 
       - name: Push isolated space to Hugging Face
         env:

@@ -109,16 +109,21 @@ The application will be accessible at `http://localhost:7860`.
 
 The repository includes a dedicated workflow (`huggingface_deployment.yml`) that automatically isolates and deploys only the required runtime files on pushes to the `main` branch.
 
+### Flat vs. Nested Requirements
+- **Root `requirements.txt`**: Points to `-r requirements/demo.txt`, which utilizes nested references for local development and Docker layers.
+- **Hugging Face `requirements.txt`**: Generated dynamically as a flat, single-level file during the deployment pipeline. This is critical because the Hugging Face Space builder only mounts the root-level `requirements.txt` during the initial build phase, and fails to resolve relative/nested `-r` files (resulting in `Could not open requirements file` errors).
+- **No Training Bloat**: The generated file excludes all training, testing, development, and tracking libraries (like `dvc`, `mlflow`, `pytest`), keeping the Space build runtime lightweight and fast.
+
 ### Space Layout Isolation
-When deployed, the Space repository contains:
+When deployed, the isolated Space repository contains only the minimum required assets:
 * **Gradio Entrypoint**: Root-level `app.py` wrapper.
-* **Dependencies**: `requirements.txt` and `requirements/` directory.
+* **Flat Dependencies**: `requirements.txt` (a single-level flat file).
 * **System Packages**: `packages.txt` (contains `libgl1` and `libglib2.0-0` to automatically configure OpenCV's OS dependencies on Hugging Face).
 * **Weights Checkpoint**: `runs/phase1/best.pth` (LFS-tracked model weights).
 * **Space Metadata**: Spaces metadata block added at the top of `README.md`.
 * **Source & Configuration**: `dronevision/`, `demo/`, `configs/`, `VERSION`, and `.gitattributes`.
 
-All testing code, development tools, raw datasets, and training logs are omitted.
+The `requirements/` directory, testing code, local settings, datasets, and logs are completely excluded.
 
 ### Secrets Configuration
 To enable automated deployments, configure a write-access token in your GitHub repository:
