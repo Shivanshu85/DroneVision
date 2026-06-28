@@ -1,8 +1,22 @@
 # DroneVision
 
+![CI](https://github.com/Shivanshu85/DroneVision/actions/workflows/ci.yml/badge.svg)
+![Docker Validation](https://github.com/Shivanshu85/DroneVision/actions/workflows/docker_validation.yml/badge.svg)
+![Hugging Face Deployment](https://github.com/Shivanshu85/DroneVision/actions/workflows/huggingface_deployment.yml/badge.svg)
+![License](https://img.shields.io/github/license/Shivanshu85/DroneVision)
+![Python](https://img.shields.io/badge/Python-3.11-blue)
+![Release](https://img.shields.io/github/v/release/Shivanshu85/DroneVision)
+![Stars](https://img.shields.io/github/stars/Shivanshu85/DroneVision)
+
 Custom single-class drone detection and counting system built from scratch with PyTorch.
 
 > **Scope**: This project detects exactly **one class — Drone (Class 0)**. It is NOT a general object detector, classifier, or segmentation system.
+
+### Demo Interface
+
+| Landing Page | Detection Details |
+|---|---|
+| ![Landing Page](demo/assets/landing_page.png) | ![Landing Page Details](demo/assets/landing_page_details.png) |
 
 ---
 
