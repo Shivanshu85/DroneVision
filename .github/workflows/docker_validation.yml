@@ -3,8 +3,34 @@ name: Docker Validation
 on:
   push:
     branches: [ main ]
+    paths:
+      - 'dronevision/**'
+      - 'demo/**'
+      - 'app.py'
+      - 'requirements/**'
+      - 'pyproject.toml'
+      - 'configs/**'
+      - 'Dockerfile'
+      - 'docker-compose.yml'
+      - '.dockerignore'
+      - '.github/workflows/docker_validation.yml'
   pull_request:
     branches: [ main ]
+    paths:
+      - 'dronevision/**'
+      - 'demo/**'
+      - 'app.py'
+      - 'requirements/**'
+      - 'pyproject.toml'
+      - 'configs/**'
+      - 'Dockerfile'
+      - 'docker-compose.yml'
+      - '.dockerignore'
+      - '.github/workflows/docker_validation.yml'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   docker-validate:

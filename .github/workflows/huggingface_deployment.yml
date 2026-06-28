@@ -3,6 +3,20 @@ name: Hugging Face Deployment
 on:
   push:
     branches: [ main ]
+    paths:
+      - 'dronevision/**'
+      - 'demo/**'
+      - 'configs/**'
+      - 'requirements/**'
+      - 'app.py'
+      - 'requirements.txt'
+      - 'VERSION'
+      - '.gitattributes'
+      - '.github/workflows/huggingface_deployment.yml'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   deploy:
@@ -42,6 +56,12 @@ jobs:
           cp requirements.txt hf_space/
           cp VERSION hf_space/
           cp .gitattributes hf_space/
+
+          echo "Creating packages.txt for system dependencies..."
+          cat << 'EOF' > hf_space/packages.txt
+          libgl1
+          libglib2.0-0
+          EOF
           
           echo "Creating Hugging Face Spaces README.md metadata header..."
           cat << 'EOF' > hf_space/README.md

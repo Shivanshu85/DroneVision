@@ -1,0 +1,7 @@
+# Core deep learning and computer vision inference dependencies
+-r base.txt
+
+numpy>=1.26.0
+torch>=2.2.0
+torchvision>=0.17.0
+opencv-python>=4.9.0

@@ -1,8 +1,8 @@
-# Development, testing, and formatting dependencies
+# Complete developer tool suite
 -r demo.txt
+-r training.txt
+-r testing.txt
 
-pytest>=8.1.0
-pytest-cov>=5.0.0
 ruff>=0.4.0
 mypy>=1.9.0
 pre-commit>=3.7.0

@@ -1,14 +1,54 @@
-# DroneVision Deployment & Pipeline Guide
+# DroneVision Deployment & Pipeline Architecture Guide
 
 This document describes how to deploy the DroneVision application locally, using Docker, or to Hugging Face Spaces, and outlines the automated CI/CD pipeline.
 
 ---
 
-## 1. Local Deployment
+## 1. Pipeline Architecture Diagram
+
+```mermaid
+graph TD
+    Dev[Developer git push] --> Trigger{Git Push Triggers}
+    
+    Trigger -- Source / Config / Req changes --> CI[ci.yml: Ruff, Mypy, pytest]
+    Trigger -- Docker / Python / Req changes --> DB[docker_validation.yml: Build & Verify Startup]
+    Trigger -- Main Branch push --> HF[huggingface_deployment.yml: Deploy to Spaces]
+    Trigger -- Tag v* push --> RL[release.yml: Build & Release Package]
+    
+    CI -->|Pass| Success[CI Success]
+    DB -->|Starts on Port 7860| Success
+    HF -->|oauth2 push| HFSpace[Hugging Face Space Live]
+    RL -->|Sdist & Wheel| Release[GitHub Release Asset]
+```
+
+---
+
+## 2. Requirements & Dependency Separation
+
+To prevent environment bloat and ensure that training dependencies (like DVC and MLflow) are not installed inside our runtime or Gradio environments, we have separated our dependencies into modular groups under the `requirements/` directory:
+
+```
+requirements/
+├── base.txt           # Core runtime utilities (pyyaml, Pillow, scipy, tqdm)
+├── runtime.txt        # Deep learning/vision engine (numpy, torch, torchvision, opencv)
+├── demo.txt           # Gradio web application dependencies
+├── training.txt       # Training and tracking dependencies (mlflow, dvc)
+├── testing.txt        # Automated test frameworks (pytest, pytest-cov)
+└── dev.txt            # Formatting, linting, auditing tools (ruff, mypy, bandit)
+```
+
+- **Local Gradio Application**: Installs only `requirements/demo.txt`.
+- **Hugging Face Space**: Installs only Gradio runtime dependencies, ensuring extremely fast container startup and low memory usage.
+- **Model Training**: Developer installs `requirements/training.txt` to run training and MLflow tracking.
+- **Onboarding/Complete Developer Workspace**: Runs `pip install -e .[dev,api]` which installs the complete `requirements/dev.txt` profile.
+
+---
+
+## 3. Local Deployment
 
 ### Prerequisites
 - Python 3.10+
-- CUDA-capable GPU (optional, fallbacks to CPU automatically)
+- CUDA-capable GPU (optional, falls back to CPU automatically)
 - Git & Git LFS
 
 ### Installation
@@ -24,7 +64,7 @@ This document describes how to deploy the DroneVision application locally, using
    source venv/bin/activate  # Windows: venv\Scripts\activate
    ```
 
-3. Install the package in editable mode with demo and API dependencies:
+3. Install the package in editable mode with development dependencies:
    ```bash
    pip install -e .[dev,api]
    ```
@@ -38,12 +78,16 @@ By default, the application will bind to `http://127.0.0.1:7860`. You can config
 
 ---
 
-## 2. Docker Deployment
+## 4. Docker Deployment
 
-We provide a production-ready, multi-stage Docker configuration that builds a minimal image and runs as a non-root user.
+Our production-ready, multi-stage `Dockerfile` incorporates advanced performance and layer-caching techniques:
 
-### Run with Docker Compose (Recommended)
-To build and spin up the Gradio application container:
+### Docker Optimizations
+- **BuildKit Pip Caching**: Leverages `--mount=type=cache,target=/root/.cache/pip` to preserve pip's downloaded wheels between builds, saving bandwidth and build time.
+- **Layer Optimization**: Copies only the `requirements/` folder first to run pip install. Source files are copied last, preventing source changes from invalidating the heavy pip layers. Re-build times are reduced from minutes to seconds.
+- **Container Security**: The container runs under a non-privileged system user (`appuser`), avoiding root-level container escalation.
+
+### Run with Docker Compose
 ```bash
 docker-compose up --build
 ```
@@ -61,86 +105,38 @@ The application will be accessible at `http://localhost:7860`.
 
 ---
 
-## 3. Hugging Face Spaces Deployment
+## 5. Hugging Face Spaces Deployment
 
-The repository is structured to enable fully automated deployments to Hugging Face Spaces. The deployment script isolates only the necessary runtime files, keeping the Space clean and lightweight.
+The repository includes a dedicated workflow (`huggingface_deployment.yml`) that automatically isolates and deploys only the required runtime files on pushes to the `main` branch.
 
 ### Space Layout Isolation
-When pushed to Hugging Face, only the following runtime structure is transferred:
-```
-Hugging Face Space Root/
-├── app.py                     # Root entrypoint wrapper
-├── requirements.txt           # Flat dependencies list
-├── VERSION                    # Version number file
-├── .gitattributes             # Git LFS config for weights
-├── README.md                  # Spaces title/emoji metadata block
-├── dronevision/               # Core library code
-├── demo/                      # Gradio UI components
-├── configs/                   # Runtime YAML settings
-└── runs/
-    └── phase1/
-        └── best.pth           # Trained model weights (LFS tracked)
-```
-All training scripts, tests, notebooks, local environments, and temporary files are excluded from the Hugging Face Space repository to optimize build speed and startup times.
+When deployed, the Space repository contains:
+* **Gradio Entrypoint**: Root-level `app.py` wrapper.
+* **Dependencies**: `requirements.txt` and `requirements/` directory.
+* **System Packages**: `packages.txt` (contains `libgl1` and `libglib2.0-0` to automatically configure OpenCV's OS dependencies on Hugging Face).
+* **Weights Checkpoint**: `runs/phase1/best.pth` (LFS-tracked model weights).
+* **Space Metadata**: Spaces metadata block added at the top of `README.md`.
+* **Source & Configuration**: `dronevision/`, `demo/`, `configs/`, `VERSION`, and `.gitattributes`.
+
+All testing code, development tools, raw datasets, and training logs are omitted.
+
+### Secrets Configuration
+To enable automated deployments, configure a write-access token in your GitHub repository:
+- Go to your repository settings: **Settings > Secrets and variables > Actions**.
+- Add a new repository secret: Name = `HF_TOKEN`, Value = (your Hugging Face Access Token).
 
 ---
 
-## 4. Automated CI/CD Workflows (GitHub Actions)
+## 6. Automated CI/CD Pipelines
 
-DroneVision uses four automated workflows under `.github/workflows/` to ensure continuous quality control:
+DroneVision uses optimized, concurrency-controlled workflows:
 
-1. **Continuous Integration (`ci.yml`)**:
-   - Runs on every push and pull request.
-   - Executes code checks using Ruff (linting and format reviews).
-   - Validates package import paths (`import dronevision`).
-   - Validates dependency packages structure via `pip check`.
-   - Runs the full unit test suite via PyTest.
-   - Fails immediately if any step encounters an error.
-
-2. **Docker Validation (`docker_validation.yml`)**:
-   - Runs on every push and pull request.
-   - Builds the Docker image from the local `Dockerfile`.
-   - Starts the container in background mode.
-   - Verifies successful container startup by polling `http://localhost:7860/` for a successful HTTP 200 response code.
-   - Cleans up the test container immediately.
-
-3. **Hugging Face Deployment (`huggingface_deployment.yml`)**:
-   - Runs automatically on pushes to the `main` branch.
-   - Collects and isolates only the required runtime files in a temporary space layout.
-   - Syncs the LFS weight checkpoints securely.
-   - Forces a git push to the Hugging Face Spaces remote repository, triggering an automatic rebuild on Hugging Face.
-
-4. **Release Automation (`release.yml`)**:
-   - Triggers when a new version tag is pushed (e.g., `v1.0.0`).
-   - Validates the codebase.
-   - Builds the source and binary wheel distributions.
-   - Automatically creates a GitHub Release and attaches the builds as assets.
-
----
-
-## 5. Security & Secrets Management
-
-To enable automated deployments to Hugging Face Spaces, you must configure a Hugging Face Access Token in your GitHub repository:
-
-### Required GitHub Secrets
-1. **`HF_TOKEN`**: A Hugging Face write-access token.
-   - Generate one at: [Hugging Face Settings > Tokens](https://huggingface.co/settings/tokens).
-   - Configure it in your GitHub repo: **Settings > Secrets and variables > Actions > New repository secret**.
-   - Set the name to `HF_TOKEN` and paste the token as the value.
-
----
-
-## 6. Troubleshooting
-
-### Logging warnings on Windows
-If you run the application on Windows, you might notice encoding warnings:
-```
-UnicodeEncodeError: 'charmap' codec can't encode character '\u2192'
-```
-This is harmless and occurs because the Windows command line console defaults to `cp1252` encoding instead of `utf-8`. To resolve this, run your shell with:
-```bash
-set PYTHONIOENCODING=utf-8
-```
-
-### Docker build failure
-If Docker fails to load the weights, verify that you have Git LFS installed locally and the checkpoint file `runs/phase1/best.pth` has its full size (~37.7 MB) rather than just the LFS metadata placeholder.
+- **CI workflow (`ci.yml`)**:
+  - Checks Ruff formatting, Ruff lints, `pip check` dependency resolutions, package import checks, and PyTest suites.
+  - Path filters limit execution to changes in `dronevision/`, `tests/`, `configs/`, or package configurations.
+- **Docker Validation (`docker_validation.yml`)**:
+  - Builds the Dockerfile using caching and verifies successful startup by polling port `7860`.
+- **Hugging Face Spaces Deployment (`huggingface_deployment.yml`)**:
+  - Isolates runtime files and commits them to the Hugging Face Space repository using secure OAuth2 (`huggingface.co/spaces/sam9507/DroneVision`).
+- **Release Automation (`release.yml`)**:
+  - Triggers on tag pushes `v*` to package and build release wheel/sdist assets.
