@@ -1,0 +1,72 @@
+name: Hugging Face Deployment
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    name: Deploy to Hugging Face Spaces
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          lfs: true
+
+      - name: Set up Git config
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Isolate Space Deployment Contents
+        run: |
+          mkdir hf_space
+          
+          # Copy essential directories and files
+          cp -r dronevision hf_space/
+          cp -r demo hf_space/
+          cp -r configs hf_space/
+          cp -r requirements hf_space/
+          
+          # Re-create runs/phase1 structure and copy best.pth
+          mkdir -p hf_space/runs/phase1
+          cp runs/phase1/best.pth hf_space/runs/phase1/best.pth
+          
+          # Copy root level files
+          cp app.py hf_space/
+          cp requirements.txt hf_space/
+          cp VERSION hf_space/
+          cp .gitattributes hf_space/
+          
+          # Create Spaces README.md containing YAML metadata block
+          cat << 'EOF' > hf_space/README.md
+          ---
+          title: DroneVision
+          emoji: 🚁
+          colorFrom: blue
+          colorTo: indigo
+          sdk: gradio
+          sdk_version: 6.19.0
+          app_file: app.py
+          pinned: false
+          ---
+          
+          # DroneVision
+          
+          Custom single-class drone detection and counting system built entirely from scratch with PyTorch.
+          EOF
+
+      - name: Push isolated space to Hugging Face
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          cd hf_space
+          git init
+          git lfs install
+          git checkout -b main
+          git remote add origin https://Shivanshu85:${HF_TOKEN}@huggingface.co/spaces/Shivanshu85/DroneVision
+          git add -A
+          git commit -m "Deploying DroneVision demo version $(cat VERSION) via GitHub Actions"
+          git push -f origin main

@@ -64,6 +64,8 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
+        with:
+          lfs: true
 
       - name: Set up Python 3.11
         uses: actions/setup-python@v5
@@ -77,6 +79,16 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements/dev.txt
           pip install -e .
+
+      - name: Validate Package Imports
+        run: |
+          python -c "import dronevision"
+          python -c "from dronevision.models.detector import DroneDetector"
+          python -c "from demo.predictor import DemoPredictor"
+
+      - name: Validate Dependencies Resolution
+        run: |
+          pip check
 
       - name: Run Test Suite with Coverage
         run: |
