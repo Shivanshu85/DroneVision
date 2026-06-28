@@ -1,5 +1,5 @@
 # Core runtime utilities
 pyyaml>=6.0.1
-Pillow>=10.3.0
+Pillow>=12.2.0
 scipy>=1.13.0
 tqdm>=4.66.4
