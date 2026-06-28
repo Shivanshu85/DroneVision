@@ -17,30 +17,33 @@ jobs:
 
       - name: Set up Git config
         run: |
+          echo "Setting up global git username and email config..."
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          echo "Git config setup complete."
 
       - name: Isolate Space Deployment Contents
         run: |
+          echo "Starting demo isolation process..."
           mkdir hf_space
           
-          # Copy essential directories and files
+          echo "Copying runtime source directories..."
           cp -r dronevision hf_space/
           cp -r demo hf_space/
           cp -r configs hf_space/
           cp -r requirements hf_space/
           
-          # Re-create runs/phase1 structure and copy best.pth
+          echo "Re-creating checkpoint paths and copying best.pth..."
           mkdir -p hf_space/runs/phase1
           cp runs/phase1/best.pth hf_space/runs/phase1/best.pth
           
-          # Copy root level files
+          echo "Copying root files and gitattributes..."
           cp app.py hf_space/
           cp requirements.txt hf_space/
           cp VERSION hf_space/
           cp .gitattributes hf_space/
           
-          # Create Spaces README.md containing YAML metadata block
+          echo "Creating Hugging Face Spaces README.md metadata header..."
           cat << 'EOF' > hf_space/README.md
           ---
           title: DroneVision
@@ -57,16 +60,42 @@ jobs:
           
           Custom single-class drone detection and counting system built entirely from scratch with PyTorch.
           EOF
+          echo "Demo isolation process successfully completed."
 
       - name: Push isolated space to Hugging Face
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
+          echo "Checking Hugging Face Token presence..."
+          if [ -z "${HF_TOKEN}" ]; then
+            echo "Error: HF_TOKEN secret is empty or missing! Please configure it in your GitHub Repository settings."
+            exit 1
+          fi
+          
+          echo "Entering deployment folder and initializing Git repository..."
           cd hf_space
           git init
+          
+          echo "Initializing Git LFS tracking..."
           git lfs install
+          
+          echo "Switching to main branch..."
           git checkout -b main
-          git remote add origin https://Shivanshu85:${HF_TOKEN}@huggingface.co/spaces/Shivanshu85/DroneVision
+          
+          echo "Adding remote origin for space spaces/sam9507/DroneVision..."
+          git remote add origin https://oauth2:${HF_TOKEN}@huggingface.co/spaces/sam9507/DroneVision
+          
+          echo "Adding files to repository index..."
           git add -A
+          
+          echo "Creating local deployment commit..."
           git commit -m "Deploying DroneVision demo version $(cat VERSION) via GitHub Actions"
-          git push -f origin main
+          
+          echo "Pushing commits to Hugging Face Spaces remote repository..."
+          if git push -f origin main; then
+            echo "Hugging Face Spaces deployment successfully completed!"
+          else
+            echo "Error: Failed to push to Hugging Face Spaces repository remote."
+            exit 1
+          fi
+
