@@ -1,3 +1,7 @@
+<div align="center">
+  <img src="demo/assets/banner.png" alt="DroneVision Banner" width="100%">
+</div>
+
 # DroneVision
 
 ![CI](https://github.com/Shivanshu85/DroneVision/actions/workflows/ci.yml/badge.svg)
